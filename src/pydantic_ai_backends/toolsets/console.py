@@ -86,6 +86,7 @@ def create_console_toolset(  # noqa: C901
     require_execute_approval: bool = True,
     default_ignore_hidden: bool = True,
     permissions: PermissionRuleset | None = None,
+    max_retries: int = 1,
 ) -> FunctionToolset[ConsoleDeps]:
     """Create a console toolset for file operations and shell execution.
 
@@ -105,6 +106,10 @@ def create_console_toolset(  # noqa: C901
         permissions: Optional permission ruleset to determine tool approval requirements.
             If provided, overrides require_write_approval and require_execute_approval
             based on whether the operation's default action is "ask".
+        max_retries: Maximum number of retries for each tool during a run.
+            When the model sends invalid arguments (e.g. missing required fields),
+            the validation error is fed back and the model can retry up to this
+            many times. Defaults to 1.
 
     Returns:
         FunctionToolset with console tools.
@@ -135,7 +140,7 @@ def create_console_toolset(  # noqa: C901
         permissions, "execute", require_execute_approval
     )
 
-    toolset: FunctionToolset[ConsoleDeps] = FunctionToolset(id=id)
+    toolset: FunctionToolset[ConsoleDeps] = FunctionToolset(id=id, max_retries=max_retries)
 
     @toolset.tool
     async def ls(  # pragma: no cover
