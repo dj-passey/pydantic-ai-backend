@@ -1,6 +1,7 @@
 """Tests for DockerSandbox initialization (without running Docker)."""
 
 import mimetypes
+import time
 
 import pytest
 
@@ -283,15 +284,21 @@ class TestDockerSandboxGrepRaw:
 
     @pytest.mark.docker
     def test_grep_raw_finds_match_without_explicit_path(self, docker_sandbox):
-        """grep_raw with no path should search the working directory, not /."""
-        docker_sandbox.write("/workspace/grep_target.txt", "hello_unique_sentinel")
-        result = docker_sandbox.grep_raw("hello_unique_sentinel")
+        """grep_raw with no path searches the working directory, not /."""
+        docker_sandbox.write("/workspace/grep_target.txt", "hello_unique_sentinel\n")
+        result = docker_sandbox.grep_raw("hello_unique_sentinel", ignore_hidden=False)
         assert isinstance(result, list)
-        assert len(result) >= 1
         assert any("grep_target.txt" in m["path"] for m in result)
 
     @pytest.mark.docker
-    def test_grep_raw_no_match_returns_empty_list(self, docker_sandbox):
-        """grep_raw returns [] when the pattern is not found."""
+    def test_grep_raw_no_path_is_fast(self, docker_sandbox):
+        """grep_raw with no path completes quickly, proving it searches . not /.
+
+        Searching / inside a Docker container takes minutes; searching the
+        workspace directory takes milliseconds.
+        """
+        start = time.monotonic()
         result = docker_sandbox.grep_raw("this_string_will_never_exist_xyzzy_99999")
+        elapsed = time.monotonic() - start
         assert result == []
+        assert elapsed < 5, f"grep_raw took {elapsed:.1f}s — likely searched / instead of ."
