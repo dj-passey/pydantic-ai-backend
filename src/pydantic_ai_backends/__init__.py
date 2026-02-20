@@ -68,6 +68,12 @@ if TYPE_CHECKING:
         SessionManager,
     )
     from pydantic_ai_backends.backends.docker.runtimes import get_runtime
+    from pydantic_ai_backends.hashline import (
+        apply_hashline_edit,
+        apply_hashline_edit_with_summary,
+        format_hashline_output,
+        line_hash,
+    )
     from pydantic_ai_backends.permissions import (
         DEFAULT_RULESET,
         PERMISSIVE_RULESET,
@@ -86,12 +92,6 @@ if TYPE_CHECKING:
         PermissionRule,
         PermissionRuleset,
         create_ruleset,
-    )
-    from pydantic_ai_backends.hashline import (
-        apply_hashline_edit,
-        apply_hashline_edit_with_summary,
-        format_hashline_output,
-        line_hash,
     )
     from pydantic_ai_backends.toolsets.console import (
         DEFAULT_MAX_IMAGE_BYTES,

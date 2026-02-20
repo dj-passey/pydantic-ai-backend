@@ -84,7 +84,7 @@ def format_hashline_output(
     lines, _ = _split_lines(content)
     total_lines = len(lines)
 
-    if total_lines == 0:
+    if total_lines == 0:  # pragma: no cover
         return "(empty file)"
 
     if offset >= total_lines:
