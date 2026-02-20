@@ -87,23 +87,38 @@ if TYPE_CHECKING:
         PermissionRuleset,
         create_ruleset,
     )
+    from pydantic_ai_backends.hashline import (
+        apply_hashline_edit,
+        apply_hashline_edit_with_summary,
+        format_hashline_output,
+        line_hash,
+    )
     from pydantic_ai_backends.toolsets.console import (
         DEFAULT_MAX_IMAGE_BYTES,
+        HASHLINE_CONSOLE_PROMPT,
         IMAGE_EXTENSIONS,
         IMAGE_MEDIA_TYPES,
         ConsoleDeps,
         ConsoleToolset,
+        EditFormat,
         create_console_toolset,
         get_console_system_prompt,
     )
 
 # Lazy loading for optional dependencies
 _LAZY_IMPORTS = {
+    # Hashline editing
+    "line_hash": "pydantic_ai_backends.hashline",
+    "format_hashline_output": "pydantic_ai_backends.hashline",
+    "apply_hashline_edit": "pydantic_ai_backends.hashline",
+    "apply_hashline_edit_with_summary": "pydantic_ai_backends.hashline",
     # Console toolset (requires pydantic-ai)
     "create_console_toolset": "pydantic_ai_backends.toolsets.console",
     "get_console_system_prompt": "pydantic_ai_backends.toolsets.console",
     "ConsoleToolset": "pydantic_ai_backends.toolsets.console",
     "ConsoleDeps": "pydantic_ai_backends.toolsets.console",
+    "EditFormat": "pydantic_ai_backends.toolsets.console",
+    "HASHLINE_CONSOLE_PROMPT": "pydantic_ai_backends.toolsets.console",
     "IMAGE_EXTENSIONS": "pydantic_ai_backends.toolsets.console",
     "IMAGE_MEDIA_TYPES": "pydantic_ai_backends.toolsets.console",
     "DEFAULT_MAX_IMAGE_BYTES": "pydantic_ai_backends.toolsets.console",
@@ -160,11 +175,18 @@ __all__ = [
     "StateBackend",
     "LocalBackend",
     "CompositeBackend",
+    # Hashline editing
+    "line_hash",
+    "format_hashline_output",
+    "apply_hashline_edit",
+    "apply_hashline_edit_with_summary",
     # Console toolset (requires pydantic-ai)
     "create_console_toolset",
     "get_console_system_prompt",
     "ConsoleToolset",
     "ConsoleDeps",
+    "EditFormat",
+    "HASHLINE_CONSOLE_PROMPT",
     # Image support constants
     "IMAGE_EXTENSIONS",
     "IMAGE_MEDIA_TYPES",
