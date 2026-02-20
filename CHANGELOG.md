@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9] - 2026-02-20
+
+### Added
+
+- **Hashline edit format** — alternative to `str_replace` that tags each line with a 2-character content hash. Models reference lines by `number:hash` pairs instead of reproducing exact text, eliminating whitespace-matching errors and reducing output tokens. Inspired by [Can Bölük's hashline research](https://can.ac/b/hashline) which showed +5 to +64pp accuracy improvement across 16 models.
+  - `edit_format` parameter on `create_console_toolset()` — set to `"hashline"` to opt in (default: `"str_replace"`)
+  - `edit_format` parameter on `get_console_system_prompt()` — returns matching system prompt
+  - When `edit_format="hashline"`:
+    - `read_file` returns lines as `1:a3|content` (number:hash|content)
+    - `hashline_edit` tool replaces `edit_file` — reference lines by number+hash, no old-text reproduction needed
+    - Operations: replace single line, replace range, insert after, delete
+    - Hash validation: edit rejected if file changed since last read
+  - New `pydantic_ai_backends.hashline` module with pure utility functions:
+    - `line_hash()` — generate 2-char hex content hash for a line
+    - `format_hashline_output()` — format file content with hashline tags
+    - `apply_hashline_edit()` — apply a hashline edit with hash validation
+    - `apply_hashline_edit_with_summary()` — same but returns human-readable summary
+  - `HASHLINE_CONSOLE_PROMPT` — system prompt for hashline mode
+  - `EditFormat` type alias exported from package
+
 ## [0.1.8] - 2026-02-19
 
 ### Fixed
