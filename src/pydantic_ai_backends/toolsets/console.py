@@ -39,7 +39,7 @@ CONSOLE_SYSTEM_PROMPT = """\
 
 You have access to console tools for file operations and command execution.
 
-### Tool Preferences — ALWAYS prefer specialized tools over shell equivalents:
+### Tool Preferences — You MUST use specialized tools instead of shell equivalents:
 - **File search**: Use `glob` (NOT `find` or `ls`)
 - **Content search**: Use `grep` (NOT shell `grep` or `rg`)
 - **Read files**: Use `read_file` (NOT `cat`, `head`, or `tail`)
@@ -50,6 +50,8 @@ You have access to console tools for file operations and command execution.
 
 ### File Operations Best Practices
 - **ALWAYS read a file before editing it** — understand existing content first
+- After editing a file, **re-read it before making subsequent edits** to the same file — \
+auto-formatters or pre-commit hooks may have changed the content on disk
 - Use `edit_file` for targeted changes (replacing a function, fixing a bug)
 - Use `write_file` only for complete file rewrites or new files
 - Use `glob` to discover files before operating on them
@@ -118,7 +120,7 @@ hashline_edit(path, start_line=2, start_hash="f1", new_content="")
 (line numbers shift after each edit)
 - Use `write_file` for complete file rewrites or new files
 
-### Tool Preferences — ALWAYS prefer specialized tools over shell equivalents:
+### Tool Preferences — You MUST use specialized tools instead of shell equivalents:
 - **File search**: Use `glob` (NOT `find` or `ls`)
 - **Content search**: Use `grep` (NOT shell `grep` or `rg`)
 - **Read files**: Use `read_file` (NOT `cat`, `head`, or `tail`)
@@ -128,6 +130,8 @@ hashline_edit(path, start_line=2, start_hash="f1", new_content="")
 (builds, tests, git commands, package installs, running scripts)
 
 ### File Operations Best Practices
+- After editing a file, **re-read it before making subsequent edits** to the same file — \
+auto-formatters or pre-commit hooks may have changed the content on disk
 - When reading large files (>200 lines), use pagination: start with \
 `read_file(path, limit=100)` to scan structure, then read targeted sections \
 with `offset` and `limit`
@@ -629,13 +633,15 @@ shell `grep` or `rg` commands.
             """Execute a shell command in the working directory.
 
             IMPORTANT: This tool is for operations that REQUIRE a real shell — \
-running tests, builds, git commands, package installs, running scripts. \
-Do NOT use it for file operations — use specialized tools instead:
-- Use `read_file` instead of `cat`, `head`, `tail`
-- Use `edit_file` instead of `sed`, `awk`
-- Use `write_file` instead of `echo >` or `cat <<EOF`
-- Use `glob` instead of `find` or `ls`
-- Use `grep` instead of shell `grep` or `rg`
+running tests, builds, git commands, package installs, running scripts.
+
+            You MUST avoid using file operation commands in the shell. \
+Use the specialized tools instead:
+- You MUST use `read_file` instead of `cat`, `head`, `tail`
+- You MUST use `edit_file`/`hashline_edit` instead of `sed`, `awk`
+- You MUST use `write_file` instead of `echo >` or `cat <<EOF`
+- You MUST use `glob` instead of `find` or `ls`
+- You MUST use `grep` instead of shell `grep` or `rg`
 
             Usage:
 - Always quote file paths containing spaces with double quotes.
