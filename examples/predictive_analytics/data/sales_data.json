@@ -1,0 +1,1540 @@
+{
+  "metadata": {
+    "description": "Monthly product sales data across regions",
+    "products": [
+      "Widget Alpha",
+      "Widget Beta",
+      "Widget Gamma"
+    ],
+    "regions": [
+      "North",
+      "South",
+      "West"
+    ],
+    "columns": [
+      "date",
+      "product",
+      "units_sold",
+      "revenue",
+      "region"
+    ],
+    "date_range": {
+      "start": "2024-01",
+      "end": "2025-12"
+    }
+  },
+  "records": [
+    {
+      "date": "2024-01",
+      "product": "Widget Alpha",
+      "units_sold": 105,
+      "revenue": 3027.57,
+      "region": "North"
+    },
+    {
+      "date": "2024-01",
+      "product": "Widget Alpha",
+      "units_sold": 83,
+      "revenue": 2433.98,
+      "region": "South"
+    },
+    {
+      "date": "2024-01",
+      "product": "Widget Alpha",
+      "units_sold": 77,
+      "revenue": 2226.73,
+      "region": "West"
+    },
+    {
+      "date": "2024-01",
+      "product": "Widget Beta",
+      "units_sold": 33,
+      "revenue": 1511.24,
+      "region": "North"
+    },
+    {
+      "date": "2024-01",
+      "product": "Widget Beta",
+      "units_sold": 47,
+      "revenue": 2124.6,
+      "region": "South"
+    },
+    {
+      "date": "2024-01",
+      "product": "Widget Beta",
+      "units_sold": 41,
+      "revenue": 1830.59,
+      "region": "West"
+    },
+    {
+      "date": "2024-01",
+      "product": "Widget Gamma",
+      "units_sold": 145,
+      "revenue": 3477.71,
+      "region": "North"
+    },
+    {
+      "date": "2024-01",
+      "product": "Widget Gamma",
+      "units_sold": 112,
+      "revenue": 2801.5,
+      "region": "South"
+    },
+    {
+      "date": "2024-01",
+      "product": "Widget Gamma",
+      "units_sold": 121,
+      "revenue": 3043.53,
+      "region": "West"
+    },
+    {
+      "date": "2024-02",
+      "product": "Widget Alpha",
+      "units_sold": 115,
+      "revenue": 3501.71,
+      "region": "North"
+    },
+    {
+      "date": "2024-02",
+      "product": "Widget Alpha",
+      "units_sold": 83,
+      "revenue": 2469.96,
+      "region": "South"
+    },
+    {
+      "date": "2024-02",
+      "product": "Widget Alpha",
+      "units_sold": 90,
+      "revenue": 2724.1,
+      "region": "West"
+    },
+    {
+      "date": "2024-02",
+      "product": "Widget Beta",
+      "units_sold": 70,
+      "revenue": 3266.33,
+      "region": "North"
+    },
+    {
+      "date": "2024-02",
+      "product": "Widget Beta",
+      "units_sold": 54,
+      "revenue": 2504.31,
+      "region": "South"
+    },
+    {
+      "date": "2024-02",
+      "product": "Widget Beta",
+      "units_sold": 58,
+      "revenue": 2589.8,
+      "region": "West"
+    },
+    {
+      "date": "2024-02",
+      "product": "Widget Gamma",
+      "units_sold": 148,
+      "revenue": 3572.53,
+      "region": "North"
+    },
+    {
+      "date": "2024-02",
+      "product": "Widget Gamma",
+      "units_sold": 131,
+      "revenue": 3361.29,
+      "region": "South"
+    },
+    {
+      "date": "2024-02",
+      "product": "Widget Gamma",
+      "units_sold": 119,
+      "revenue": 2853.84,
+      "region": "West"
+    },
+    {
+      "date": "2024-03",
+      "product": "Widget Alpha",
+      "units_sold": 104,
+      "revenue": 3076.0,
+      "region": "North"
+    },
+    {
+      "date": "2024-03",
+      "product": "Widget Alpha",
+      "units_sold": 83,
+      "revenue": 2515.83,
+      "region": "South"
+    },
+    {
+      "date": "2024-03",
+      "product": "Widget Alpha",
+      "units_sold": 108,
+      "revenue": 3092.08,
+      "region": "West"
+    },
+    {
+      "date": "2024-03",
+      "product": "Widget Beta",
+      "units_sold": 79,
+      "revenue": 3567.88,
+      "region": "North"
+    },
+    {
+      "date": "2024-03",
+      "product": "Widget Beta",
+      "units_sold": 74,
+      "revenue": 3289.55,
+      "region": "South"
+    },
+    {
+      "date": "2024-03",
+      "product": "Widget Beta",
+      "units_sold": 70,
+      "revenue": 3084.85,
+      "region": "West"
+    },
+    {
+      "date": "2024-03",
+      "product": "Widget Gamma",
+      "units_sold": 155,
+      "revenue": 3920.93,
+      "region": "North"
+    },
+    {
+      "date": "2024-03",
+      "product": "Widget Gamma",
+      "units_sold": 124,
+      "revenue": 3057.11,
+      "region": "South"
+    },
+    {
+      "date": "2024-03",
+      "product": "Widget Gamma",
+      "units_sold": 118,
+      "revenue": 3010.35,
+      "region": "West"
+    },
+    {
+      "date": "2024-04",
+      "product": "Widget Alpha",
+      "units_sold": 110,
+      "revenue": 3353.22,
+      "region": "North"
+    },
+    {
+      "date": "2024-04",
+      "product": "Widget Alpha",
+      "units_sold": 102,
+      "revenue": 2995.55,
+      "region": "South"
+    },
+    {
+      "date": "2024-04",
+      "product": "Widget Alpha",
+      "units_sold": 92,
+      "revenue": 2858.07,
+      "region": "West"
+    },
+    {
+      "date": "2024-04",
+      "product": "Widget Beta",
+      "units_sold": 112,
+      "revenue": 4838.9,
+      "region": "North"
+    },
+    {
+      "date": "2024-04",
+      "product": "Widget Beta",
+      "units_sold": 68,
+      "revenue": 3045.74,
+      "region": "South"
+    },
+    {
+      "date": "2024-04",
+      "product": "Widget Beta",
+      "units_sold": 96,
+      "revenue": 4261.61,
+      "region": "West"
+    },
+    {
+      "date": "2024-04",
+      "product": "Widget Gamma",
+      "units_sold": 141,
+      "revenue": 3473.98,
+      "region": "North"
+    },
+    {
+      "date": "2024-04",
+      "product": "Widget Gamma",
+      "units_sold": 114,
+      "revenue": 2783.59,
+      "region": "South"
+    },
+    {
+      "date": "2024-04",
+      "product": "Widget Gamma",
+      "units_sold": 137,
+      "revenue": 3487.87,
+      "region": "West"
+    },
+    {
+      "date": "2024-05",
+      "product": "Widget Alpha",
+      "units_sold": 119,
+      "revenue": 3608.96,
+      "region": "North"
+    },
+    {
+      "date": "2024-05",
+      "product": "Widget Alpha",
+      "units_sold": 89,
+      "revenue": 2679.12,
+      "region": "South"
+    },
+    {
+      "date": "2024-05",
+      "product": "Widget Alpha",
+      "units_sold": 104,
+      "revenue": 3014.98,
+      "region": "West"
+    },
+    {
+      "date": "2024-05",
+      "product": "Widget Beta",
+      "units_sold": 111,
+      "revenue": 4880.09,
+      "region": "North"
+    },
+    {
+      "date": "2024-05",
+      "product": "Widget Beta",
+      "units_sold": 99,
+      "revenue": 4517.37,
+      "region": "South"
+    },
+    {
+      "date": "2024-05",
+      "product": "Widget Beta",
+      "units_sold": 99,
+      "revenue": 4330.09,
+      "region": "West"
+    },
+    {
+      "date": "2024-05",
+      "product": "Widget Gamma",
+      "units_sold": 135,
+      "revenue": 3490.71,
+      "region": "North"
+    },
+    {
+      "date": "2024-05",
+      "product": "Widget Gamma",
+      "units_sold": 114,
+      "revenue": 2723.44,
+      "region": "South"
+    },
+    {
+      "date": "2024-05",
+      "product": "Widget Gamma",
+      "units_sold": 130,
+      "revenue": 3097.93,
+      "region": "West"
+    },
+    {
+      "date": "2024-06",
+      "product": "Widget Alpha",
+      "units_sold": 135,
+      "revenue": 4009.97,
+      "region": "North"
+    },
+    {
+      "date": "2024-06",
+      "product": "Widget Alpha",
+      "units_sold": 92,
+      "revenue": 2680.23,
+      "region": "South"
+    },
+    {
+      "date": "2024-06",
+      "product": "Widget Alpha",
+      "units_sold": 134,
+      "revenue": 4047.01,
+      "region": "West"
+    },
+    {
+      "date": "2024-06",
+      "product": "Widget Beta",
+      "units_sold": 127,
+      "revenue": 5609.09,
+      "region": "North"
+    },
+    {
+      "date": "2024-06",
+      "product": "Widget Beta",
+      "units_sold": 95,
+      "revenue": 4274.67,
+      "region": "South"
+    },
+    {
+      "date": "2024-06",
+      "product": "Widget Beta",
+      "units_sold": 115,
+      "revenue": 5389.53,
+      "region": "West"
+    },
+    {
+      "date": "2024-06",
+      "product": "Widget Gamma",
+      "units_sold": 134,
+      "revenue": 3230.36,
+      "region": "North"
+    },
+    {
+      "date": "2024-06",
+      "product": "Widget Gamma",
+      "units_sold": 90,
+      "revenue": 2192.99,
+      "region": "South"
+    },
+    {
+      "date": "2024-06",
+      "product": "Widget Gamma",
+      "units_sold": 116,
+      "revenue": 2911.3,
+      "region": "West"
+    },
+    {
+      "date": "2024-07",
+      "product": "Widget Alpha",
+      "units_sold": 156,
+      "revenue": 4719.59,
+      "region": "North"
+    },
+    {
+      "date": "2024-07",
+      "product": "Widget Alpha",
+      "units_sold": 124,
+      "revenue": 3751.07,
+      "region": "South"
+    },
+    {
+      "date": "2024-07",
+      "product": "Widget Alpha",
+      "units_sold": 121,
+      "revenue": 3528.11,
+      "region": "West"
+    },
+    {
+      "date": "2024-07",
+      "product": "Widget Beta",
+      "units_sold": 103,
+      "revenue": 4639.42,
+      "region": "North"
+    },
+    {
+      "date": "2024-07",
+      "product": "Widget Beta",
+      "units_sold": 72,
+      "revenue": 3322.87,
+      "region": "South"
+    },
+    {
+      "date": "2024-07",
+      "product": "Widget Beta",
+      "units_sold": 109,
+      "revenue": 4713.53,
+      "region": "West"
+    },
+    {
+      "date": "2024-07",
+      "product": "Widget Gamma",
+      "units_sold": 135,
+      "revenue": 3260.24,
+      "region": "North"
+    },
+    {
+      "date": "2024-07",
+      "product": "Widget Gamma",
+      "units_sold": 103,
+      "revenue": 2554.96,
+      "region": "South"
+    },
+    {
+      "date": "2024-07",
+      "product": "Widget Gamma",
+      "units_sold": 97,
+      "revenue": 2397.06,
+      "region": "West"
+    },
+    {
+      "date": "2024-08",
+      "product": "Widget Alpha",
+      "units_sold": 160,
+      "revenue": 5038.14,
+      "region": "North"
+    },
+    {
+      "date": "2024-08",
+      "product": "Widget Alpha",
+      "units_sold": 118,
+      "revenue": 3452.0,
+      "region": "South"
+    },
+    {
+      "date": "2024-08",
+      "product": "Widget Alpha",
+      "units_sold": 134,
+      "revenue": 4165.03,
+      "region": "West"
+    },
+    {
+      "date": "2024-08",
+      "product": "Widget Beta",
+      "units_sold": 85,
+      "revenue": 3893.96,
+      "region": "North"
+    },
+    {
+      "date": "2024-08",
+      "product": "Widget Beta",
+      "units_sold": 63,
+      "revenue": 2886.51,
+      "region": "South"
+    },
+    {
+      "date": "2024-08",
+      "product": "Widget Beta",
+      "units_sold": 87,
+      "revenue": 4013.22,
+      "region": "West"
+    },
+    {
+      "date": "2024-08",
+      "product": "Widget Gamma",
+      "units_sold": 134,
+      "revenue": 3397.22,
+      "region": "North"
+    },
+    {
+      "date": "2024-08",
+      "product": "Widget Gamma",
+      "units_sold": 81,
+      "revenue": 1983.18,
+      "region": "South"
+    },
+    {
+      "date": "2024-08",
+      "product": "Widget Gamma",
+      "units_sold": 96,
+      "revenue": 2388.89,
+      "region": "West"
+    },
+    {
+      "date": "2024-09",
+      "product": "Widget Alpha",
+      "units_sold": 179,
+      "revenue": 5489.26,
+      "region": "North"
+    },
+    {
+      "date": "2024-09",
+      "product": "Widget Alpha",
+      "units_sold": 131,
+      "revenue": 3837.01,
+      "region": "South"
+    },
+    {
+      "date": "2024-09",
+      "product": "Widget Alpha",
+      "units_sold": 140,
+      "revenue": 4310.02,
+      "region": "West"
+    },
+    {
+      "date": "2024-09",
+      "product": "Widget Beta",
+      "units_sold": 81,
+      "revenue": 3795.4,
+      "region": "North"
+    },
+    {
+      "date": "2024-09",
+      "product": "Widget Beta",
+      "units_sold": 72,
+      "revenue": 3280.6,
+      "region": "South"
+    },
+    {
+      "date": "2024-09",
+      "product": "Widget Beta",
+      "units_sold": 79,
+      "revenue": 3604.4,
+      "region": "West"
+    },
+    {
+      "date": "2024-09",
+      "product": "Widget Gamma",
+      "units_sold": 124,
+      "revenue": 3006.66,
+      "region": "North"
+    },
+    {
+      "date": "2024-09",
+      "product": "Widget Gamma",
+      "units_sold": 86,
+      "revenue": 2206.44,
+      "region": "South"
+    },
+    {
+      "date": "2024-09",
+      "product": "Widget Gamma",
+      "units_sold": 104,
+      "revenue": 2717.91,
+      "region": "West"
+    },
+    {
+      "date": "2024-10",
+      "product": "Widget Alpha",
+      "units_sold": 186,
+      "revenue": 5596.94,
+      "region": "North"
+    },
+    {
+      "date": "2024-10",
+      "product": "Widget Alpha",
+      "units_sold": 114,
+      "revenue": 3453.84,
+      "region": "South"
+    },
+    {
+      "date": "2024-10",
+      "product": "Widget Alpha",
+      "units_sold": 146,
+      "revenue": 4169.53,
+      "region": "West"
+    },
+    {
+      "date": "2024-10",
+      "product": "Widget Beta",
+      "units_sold": 74,
+      "revenue": 3284.37,
+      "region": "North"
+    },
+    {
+      "date": "2024-10",
+      "product": "Widget Beta",
+      "units_sold": 56,
+      "revenue": 2597.31,
+      "region": "South"
+    },
+    {
+      "date": "2024-10",
+      "product": "Widget Beta",
+      "units_sold": 43,
+      "revenue": 1849.46,
+      "region": "West"
+    },
+    {
+      "date": "2024-10",
+      "product": "Widget Gamma",
+      "units_sold": 128,
+      "revenue": 3221.55,
+      "region": "North"
+    },
+    {
+      "date": "2024-10",
+      "product": "Widget Gamma",
+      "units_sold": 73,
+      "revenue": 1749.38,
+      "region": "South"
+    },
+    {
+      "date": "2024-10",
+      "product": "Widget Gamma",
+      "units_sold": 97,
+      "revenue": 2501.64,
+      "region": "West"
+    },
+    {
+      "date": "2024-11",
+      "product": "Widget Alpha",
+      "units_sold": 189,
+      "revenue": 5688.54,
+      "region": "North"
+    },
+    {
+      "date": "2024-11",
+      "product": "Widget Alpha",
+      "units_sold": 124,
+      "revenue": 3581.76,
+      "region": "South"
+    },
+    {
+      "date": "2024-11",
+      "product": "Widget Alpha",
+      "units_sold": 153,
+      "revenue": 4795.1,
+      "region": "West"
+    },
+    {
+      "date": "2024-11",
+      "product": "Widget Beta",
+      "units_sold": 35,
+      "revenue": 1538.0,
+      "region": "North"
+    },
+    {
+      "date": "2024-11",
+      "product": "Widget Beta",
+      "units_sold": 46,
+      "revenue": 2092.06,
+      "region": "South"
+    },
+    {
+      "date": "2024-11",
+      "product": "Widget Beta",
+      "units_sold": 53,
+      "revenue": 2316.26,
+      "region": "West"
+    },
+    {
+      "date": "2024-11",
+      "product": "Widget Gamma",
+      "units_sold": 112,
+      "revenue": 2871.47,
+      "region": "North"
+    },
+    {
+      "date": "2024-11",
+      "product": "Widget Gamma",
+      "units_sold": 89,
+      "revenue": 2158.51,
+      "region": "South"
+    },
+    {
+      "date": "2024-11",
+      "product": "Widget Gamma",
+      "units_sold": 87,
+      "revenue": 2153.03,
+      "region": "West"
+    },
+    {
+      "date": "2024-12",
+      "product": "Widget Alpha",
+      "units_sold": 194,
+      "revenue": 5907.23,
+      "region": "North"
+    },
+    {
+      "date": "2024-12",
+      "product": "Widget Alpha",
+      "units_sold": 140,
+      "revenue": 4367.84,
+      "region": "South"
+    },
+    {
+      "date": "2024-12",
+      "product": "Widget Alpha",
+      "units_sold": 158,
+      "revenue": 4560.36,
+      "region": "West"
+    },
+    {
+      "date": "2024-12",
+      "product": "Widget Beta",
+      "units_sold": 52,
+      "revenue": 2237.98,
+      "region": "North"
+    },
+    {
+      "date": "2024-12",
+      "product": "Widget Beta",
+      "units_sold": 30,
+      "revenue": 1361.92,
+      "region": "South"
+    },
+    {
+      "date": "2024-12",
+      "product": "Widget Beta",
+      "units_sold": 43,
+      "revenue": 1952.11,
+      "region": "West"
+    },
+    {
+      "date": "2024-12",
+      "product": "Widget Gamma",
+      "units_sold": 90,
+      "revenue": 2153.47,
+      "region": "North"
+    },
+    {
+      "date": "2024-12",
+      "product": "Widget Gamma",
+      "units_sold": 83,
+      "revenue": 1983.47,
+      "region": "South"
+    },
+    {
+      "date": "2024-12",
+      "product": "Widget Gamma",
+      "units_sold": 76,
+      "revenue": 1977.03,
+      "region": "West"
+    },
+    {
+      "date": "2025-01",
+      "product": "Widget Alpha",
+      "units_sold": 208,
+      "revenue": 6134.19,
+      "region": "North"
+    },
+    {
+      "date": "2025-01",
+      "product": "Widget Alpha",
+      "units_sold": 148,
+      "revenue": 4323.67,
+      "region": "South"
+    },
+    {
+      "date": "2025-01",
+      "product": "Widget Alpha",
+      "units_sold": 172,
+      "revenue": 5152.47,
+      "region": "West"
+    },
+    {
+      "date": "2025-01",
+      "product": "Widget Beta",
+      "units_sold": 47,
+      "revenue": 2037.23,
+      "region": "North"
+    },
+    {
+      "date": "2025-01",
+      "product": "Widget Beta",
+      "units_sold": 48,
+      "revenue": 2242.59,
+      "region": "South"
+    },
+    {
+      "date": "2025-01",
+      "product": "Widget Beta",
+      "units_sold": 41,
+      "revenue": 1839.96,
+      "region": "West"
+    },
+    {
+      "date": "2025-01",
+      "product": "Widget Gamma",
+      "units_sold": 110,
+      "revenue": 2742.57,
+      "region": "North"
+    },
+    {
+      "date": "2025-01",
+      "product": "Widget Gamma",
+      "units_sold": 73,
+      "revenue": 1768.5,
+      "region": "South"
+    },
+    {
+      "date": "2025-01",
+      "product": "Widget Gamma",
+      "units_sold": 73,
+      "revenue": 1854.01,
+      "region": "West"
+    },
+    {
+      "date": "2025-02",
+      "product": "Widget Alpha",
+      "units_sold": 200,
+      "revenue": 5954.15,
+      "region": "North"
+    },
+    {
+      "date": "2025-02",
+      "product": "Widget Alpha",
+      "units_sold": 152,
+      "revenue": 4725.91,
+      "region": "South"
+    },
+    {
+      "date": "2025-02",
+      "product": "Widget Alpha",
+      "units_sold": 159,
+      "revenue": 4852.69,
+      "region": "West"
+    },
+    {
+      "date": "2025-02",
+      "product": "Widget Beta",
+      "units_sold": 65,
+      "revenue": 2807.54,
+      "region": "North"
+    },
+    {
+      "date": "2025-02",
+      "product": "Widget Beta",
+      "units_sold": 42,
+      "revenue": 1933.13,
+      "region": "South"
+    },
+    {
+      "date": "2025-02",
+      "product": "Widget Beta",
+      "units_sold": 61,
+      "revenue": 2844.28,
+      "region": "West"
+    },
+    {
+      "date": "2025-02",
+      "product": "Widget Gamma",
+      "units_sold": 87,
+      "revenue": 2107.92,
+      "region": "North"
+    },
+    {
+      "date": "2025-02",
+      "product": "Widget Gamma",
+      "units_sold": 73,
+      "revenue": 1815.62,
+      "region": "South"
+    },
+    {
+      "date": "2025-02",
+      "product": "Widget Gamma",
+      "units_sold": 78,
+      "revenue": 1888.28,
+      "region": "West"
+    },
+    {
+      "date": "2025-03",
+      "product": "Widget Alpha",
+      "units_sold": 211,
+      "revenue": 6171.63,
+      "region": "North"
+    },
+    {
+      "date": "2025-03",
+      "product": "Widget Alpha",
+      "units_sold": 173,
+      "revenue": 4969.62,
+      "region": "South"
+    },
+    {
+      "date": "2025-03",
+      "product": "Widget Alpha",
+      "units_sold": 190,
+      "revenue": 5905.97,
+      "region": "West"
+    },
+    {
+      "date": "2025-03",
+      "product": "Widget Beta",
+      "units_sold": 82,
+      "revenue": 3541.63,
+      "region": "North"
+    },
+    {
+      "date": "2025-03",
+      "product": "Widget Beta",
+      "units_sold": 65,
+      "revenue": 3071.04,
+      "region": "South"
+    },
+    {
+      "date": "2025-03",
+      "product": "Widget Beta",
+      "units_sold": 79,
+      "revenue": 3382.5,
+      "region": "West"
+    },
+    {
+      "date": "2025-03",
+      "product": "Widget Gamma",
+      "units_sold": 77,
+      "revenue": 2007.08,
+      "region": "North"
+    },
+    {
+      "date": "2025-03",
+      "product": "Widget Gamma",
+      "units_sold": 79,
+      "revenue": 1922.93,
+      "region": "South"
+    },
+    {
+      "date": "2025-03",
+      "product": "Widget Gamma",
+      "units_sold": 74,
+      "revenue": 1847.34,
+      "region": "West"
+    },
+    {
+      "date": "2025-04",
+      "product": "Widget Alpha",
+      "units_sold": 211,
+      "revenue": 6560.82,
+      "region": "North"
+    },
+    {
+      "date": "2025-04",
+      "product": "Widget Alpha",
+      "units_sold": 178,
+      "revenue": 5104.31,
+      "region": "South"
+    },
+    {
+      "date": "2025-04",
+      "product": "Widget Alpha",
+      "units_sold": 184,
+      "revenue": 5245.19,
+      "region": "West"
+    },
+    {
+      "date": "2025-04",
+      "product": "Widget Beta",
+      "units_sold": 97,
+      "revenue": 4262.51,
+      "region": "North"
+    },
+    {
+      "date": "2025-04",
+      "product": "Widget Beta",
+      "units_sold": 85,
+      "revenue": 3934.06,
+      "region": "South"
+    },
+    {
+      "date": "2025-04",
+      "product": "Widget Beta",
+      "units_sold": 79,
+      "revenue": 3527.63,
+      "region": "West"
+    },
+    {
+      "date": "2025-04",
+      "product": "Widget Gamma",
+      "units_sold": 100,
+      "revenue": 2557.63,
+      "region": "North"
+    },
+    {
+      "date": "2025-04",
+      "product": "Widget Gamma",
+      "units_sold": 73,
+      "revenue": 1835.18,
+      "region": "South"
+    },
+    {
+      "date": "2025-04",
+      "product": "Widget Gamma",
+      "units_sold": 79,
+      "revenue": 1972.37,
+      "region": "West"
+    },
+    {
+      "date": "2025-05",
+      "product": "Widget Alpha",
+      "units_sold": 219,
+      "revenue": 6436.44,
+      "region": "North"
+    },
+    {
+      "date": "2025-05",
+      "product": "Widget Alpha",
+      "units_sold": 186,
+      "revenue": 5333.63,
+      "region": "South"
+    },
+    {
+      "date": "2025-05",
+      "product": "Widget Alpha",
+      "units_sold": 201,
+      "revenue": 6055.44,
+      "region": "West"
+    },
+    {
+      "date": "2025-05",
+      "product": "Widget Beta",
+      "units_sold": 122,
+      "revenue": 5387.67,
+      "region": "North"
+    },
+    {
+      "date": "2025-05",
+      "product": "Widget Beta",
+      "units_sold": 71,
+      "revenue": 3221.89,
+      "region": "South"
+    },
+    {
+      "date": "2025-05",
+      "product": "Widget Beta",
+      "units_sold": 98,
+      "revenue": 4594.95,
+      "region": "West"
+    },
+    {
+      "date": "2025-05",
+      "product": "Widget Gamma",
+      "units_sold": 81,
+      "revenue": 1955.63,
+      "region": "North"
+    },
+    {
+      "date": "2025-05",
+      "product": "Widget Gamma",
+      "units_sold": 75,
+      "revenue": 1876.47,
+      "region": "South"
+    },
+    {
+      "date": "2025-05",
+      "product": "Widget Gamma",
+      "units_sold": 80,
+      "revenue": 1937.16,
+      "region": "West"
+    },
+    {
+      "date": "2025-06",
+      "product": "Widget Alpha",
+      "units_sold": 240,
+      "revenue": 6888.93,
+      "region": "North"
+    },
+    {
+      "date": "2025-06",
+      "product": "Widget Alpha",
+      "units_sold": 189,
+      "revenue": 5519.86,
+      "region": "South"
+    },
+    {
+      "date": "2025-06",
+      "product": "Widget Alpha",
+      "units_sold": 188,
+      "revenue": 5889.06,
+      "region": "West"
+    },
+    {
+      "date": "2025-06",
+      "product": "Widget Beta",
+      "units_sold": 123,
+      "revenue": 5394.53,
+      "region": "North"
+    },
+    {
+      "date": "2025-06",
+      "product": "Widget Beta",
+      "units_sold": 94,
+      "revenue": 4035.31,
+      "region": "South"
+    },
+    {
+      "date": "2025-06",
+      "product": "Widget Beta",
+      "units_sold": 89,
+      "revenue": 3972.65,
+      "region": "West"
+    },
+    {
+      "date": "2025-06",
+      "product": "Widget Gamma",
+      "units_sold": 78,
+      "revenue": 1962.72,
+      "region": "North"
+    },
+    {
+      "date": "2025-06",
+      "product": "Widget Gamma",
+      "units_sold": 51,
+      "revenue": 1330.43,
+      "region": "South"
+    },
+    {
+      "date": "2025-06",
+      "product": "Widget Gamma",
+      "units_sold": 54,
+      "revenue": 1372.91,
+      "region": "West"
+    },
+    {
+      "date": "2025-07",
+      "product": "Widget Alpha",
+      "units_sold": 239,
+      "revenue": 6982.64,
+      "region": "North"
+    },
+    {
+      "date": "2025-07",
+      "product": "Widget Alpha",
+      "units_sold": 180,
+      "revenue": 5200.67,
+      "region": "South"
+    },
+    {
+      "date": "2025-07",
+      "product": "Widget Alpha",
+      "units_sold": 212,
+      "revenue": 6232.8,
+      "region": "West"
+    },
+    {
+      "date": "2025-07",
+      "product": "Widget Beta",
+      "units_sold": 109,
+      "revenue": 5115.43,
+      "region": "North"
+    },
+    {
+      "date": "2025-07",
+      "product": "Widget Beta",
+      "units_sold": 99,
+      "revenue": 4264.57,
+      "region": "South"
+    },
+    {
+      "date": "2025-07",
+      "product": "Widget Beta",
+      "units_sold": 96,
+      "revenue": 4372.34,
+      "region": "West"
+    },
+    {
+      "date": "2025-07",
+      "product": "Widget Gamma",
+      "units_sold": 73,
+      "revenue": 1915.54,
+      "region": "North"
+    },
+    {
+      "date": "2025-07",
+      "product": "Widget Gamma",
+      "units_sold": 39,
+      "revenue": 978.67,
+      "region": "South"
+    },
+    {
+      "date": "2025-07",
+      "product": "Widget Gamma",
+      "units_sold": 60,
+      "revenue": 1464.78,
+      "region": "West"
+    },
+    {
+      "date": "2025-08",
+      "product": "Widget Alpha",
+      "units_sold": 266,
+      "revenue": 7859.51,
+      "region": "North"
+    },
+    {
+      "date": "2025-08",
+      "product": "Widget Alpha",
+      "units_sold": 176,
+      "revenue": 5480.25,
+      "region": "South"
+    },
+    {
+      "date": "2025-08",
+      "product": "Widget Alpha",
+      "units_sold": 210,
+      "revenue": 6164.54,
+      "region": "West"
+    },
+    {
+      "date": "2025-08",
+      "product": "Widget Beta",
+      "units_sold": 99,
+      "revenue": 4603.68,
+      "region": "North"
+    },
+    {
+      "date": "2025-08",
+      "product": "Widget Beta",
+      "units_sold": 82,
+      "revenue": 3617.13,
+      "region": "South"
+    },
+    {
+      "date": "2025-08",
+      "product": "Widget Beta",
+      "units_sold": 95,
+      "revenue": 4340.82,
+      "region": "West"
+    },
+    {
+      "date": "2025-08",
+      "product": "Widget Gamma",
+      "units_sold": 50,
+      "revenue": 1270.98,
+      "region": "North"
+    },
+    {
+      "date": "2025-08",
+      "product": "Widget Gamma",
+      "units_sold": 50,
+      "revenue": 1224.92,
+      "region": "South"
+    },
+    {
+      "date": "2025-08",
+      "product": "Widget Gamma",
+      "units_sold": 61,
+      "revenue": 1464.55,
+      "region": "West"
+    },
+    {
+      "date": "2025-09",
+      "product": "Widget Alpha",
+      "units_sold": 273,
+      "revenue": 7890.48,
+      "region": "North"
+    },
+    {
+      "date": "2025-09",
+      "product": "Widget Alpha",
+      "units_sold": 183,
+      "revenue": 5703.95,
+      "region": "South"
+    },
+    {
+      "date": "2025-09",
+      "product": "Widget Alpha",
+      "units_sold": 229,
+      "revenue": 6906.56,
+      "region": "West"
+    },
+    {
+      "date": "2025-09",
+      "product": "Widget Beta",
+      "units_sold": 73,
+      "revenue": 3213.31,
+      "region": "North"
+    },
+    {
+      "date": "2025-09",
+      "product": "Widget Beta",
+      "units_sold": 51,
+      "revenue": 2344.94,
+      "region": "South"
+    },
+    {
+      "date": "2025-09",
+      "product": "Widget Beta",
+      "units_sold": 59,
+      "revenue": 2704.78,
+      "region": "West"
+    },
+    {
+      "date": "2025-09",
+      "product": "Widget Gamma",
+      "units_sold": 72,
+      "revenue": 1757.52,
+      "region": "North"
+    },
+    {
+      "date": "2025-09",
+      "product": "Widget Gamma",
+      "units_sold": 45,
+      "revenue": 1097.0,
+      "region": "South"
+    },
+    {
+      "date": "2025-09",
+      "product": "Widget Gamma",
+      "units_sold": 65,
+      "revenue": 1681.24,
+      "region": "West"
+    },
+    {
+      "date": "2025-10",
+      "product": "Widget Alpha",
+      "units_sold": 255,
+      "revenue": 7752.73,
+      "region": "North"
+    },
+    {
+      "date": "2025-10",
+      "product": "Widget Alpha",
+      "units_sold": 212,
+      "revenue": 6217.97,
+      "region": "South"
+    },
+    {
+      "date": "2025-10",
+      "product": "Widget Alpha",
+      "units_sold": 212,
+      "revenue": 6254.14,
+      "region": "West"
+    },
+    {
+      "date": "2025-10",
+      "product": "Widget Beta",
+      "units_sold": 49,
+      "revenue": 2235.23,
+      "region": "North"
+    },
+    {
+      "date": "2025-10",
+      "product": "Widget Beta",
+      "units_sold": 38,
+      "revenue": 1652.13,
+      "region": "South"
+    },
+    {
+      "date": "2025-10",
+      "product": "Widget Beta",
+      "units_sold": 50,
+      "revenue": 2261.63,
+      "region": "West"
+    },
+    {
+      "date": "2025-10",
+      "product": "Widget Gamma",
+      "units_sold": 53,
+      "revenue": 1333.07,
+      "region": "North"
+    },
+    {
+      "date": "2025-10",
+      "product": "Widget Gamma",
+      "units_sold": 29,
+      "revenue": 694.21,
+      "region": "South"
+    },
+    {
+      "date": "2025-10",
+      "product": "Widget Gamma",
+      "units_sold": 59,
+      "revenue": 1503.18,
+      "region": "West"
+    },
+    {
+      "date": "2025-11",
+      "product": "Widget Alpha",
+      "units_sold": 265,
+      "revenue": 7986.24,
+      "region": "North"
+    },
+    {
+      "date": "2025-11",
+      "product": "Widget Alpha",
+      "units_sold": 218,
+      "revenue": 6454.47,
+      "region": "South"
+    },
+    {
+      "date": "2025-11",
+      "product": "Widget Alpha",
+      "units_sold": 236,
+      "revenue": 6830.85,
+      "region": "West"
+    },
+    {
+      "date": "2025-11",
+      "product": "Widget Beta",
+      "units_sold": 34,
+      "revenue": 1459.9,
+      "region": "North"
+    },
+    {
+      "date": "2025-11",
+      "product": "Widget Beta",
+      "units_sold": 30,
+      "revenue": 1403.86,
+      "region": "South"
+    },
+    {
+      "date": "2025-11",
+      "product": "Widget Beta",
+      "units_sold": 48,
+      "revenue": 2261.99,
+      "region": "West"
+    },
+    {
+      "date": "2025-11",
+      "product": "Widget Gamma",
+      "units_sold": 36,
+      "revenue": 935.9,
+      "region": "North"
+    },
+    {
+      "date": "2025-11",
+      "product": "Widget Gamma",
+      "units_sold": 28,
+      "revenue": 712.74,
+      "region": "South"
+    },
+    {
+      "date": "2025-11",
+      "product": "Widget Gamma",
+      "units_sold": 48,
+      "revenue": 1152.34,
+      "region": "West"
+    },
+    {
+      "date": "2025-12",
+      "product": "Widget Alpha",
+      "units_sold": 293,
+      "revenue": 8842.64,
+      "region": "North"
+    },
+    {
+      "date": "2025-12",
+      "product": "Widget Alpha",
+      "units_sold": 225,
+      "revenue": 6686.8,
+      "region": "South"
+    },
+    {
+      "date": "2025-12",
+      "product": "Widget Alpha",
+      "units_sold": 245,
+      "revenue": 7533.37,
+      "region": "West"
+    },
+    {
+      "date": "2025-12",
+      "product": "Widget Beta",
+      "units_sold": 74,
+      "revenue": 3473.15,
+      "region": "North"
+    },
+    {
+      "date": "2025-12",
+      "product": "Widget Beta",
+      "units_sold": 57,
+      "revenue": 2478.43,
+      "region": "South"
+    },
+    {
+      "date": "2025-12",
+      "product": "Widget Beta",
+      "units_sold": 61,
+      "revenue": 2830.31,
+      "region": "West"
+    },
+    {
+      "date": "2025-12",
+      "product": "Widget Gamma",
+      "units_sold": 58,
+      "revenue": 1437.28,
+      "region": "North"
+    },
+    {
+      "date": "2025-12",
+      "product": "Widget Gamma",
+      "units_sold": 23,
+      "revenue": 588.6,
+      "region": "South"
+    },
+    {
+      "date": "2025-12",
+      "product": "Widget Gamma",
+      "units_sold": 33,
+      "revenue": 848.3,
+      "region": "West"
+    }
+  ]
+}

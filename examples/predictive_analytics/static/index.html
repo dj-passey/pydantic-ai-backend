@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Analytics — PydanticAI + Docker Sandbox</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>Predictive Analytics</h1>
+            <span class="subtitle">PydanticAI + Docker Sandbox</span>
+            <div class="status">
+                <span class="dot" id="status-dot"></span>
+                <span id="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <main class="chat-stream" id="chat-stream">
+            <div class="welcome" id="welcome">
+                <h2>Sales Analytics Agent</h2>
+                <p>Explore sales data, run predictions with scikit-learn in Docker, and visualize results.</p>
+                <div class="hints">
+                    <button class="hint-btn" data-message="Show me monthly sales trends for all products">Sales trends</button>
+                    <button class="hint-btn" data-message="Predict Widget Alpha sales for the next 6 months using linear regression">Predict Alpha sales</button>
+                    <button class="hint-btn" data-message="Compare all products by total revenue and create a chart">Compare products</button>
+                    <button class="hint-btn" data-message="Which product is growing fastest? Show me the data.">Growth analysis</button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="input-area">
+            <div class="input-wrapper">
+                <textarea id="message-input" placeholder="Ask about sales data, predictions, or charts..." rows="1"></textarea>
+                <button class="send-btn" id="send-btn">Send</button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
