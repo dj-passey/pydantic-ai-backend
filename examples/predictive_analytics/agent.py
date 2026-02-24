@@ -121,29 +121,20 @@ async def query_data(
             key = (r["date"], r["product"])
             groups[key]["units_sold"] += r["units_sold"]
             groups[key]["revenue"] += r["revenue"]
-        result = [
-            {"date": k[0], "product": k[1], **v}
-            for k, v in sorted(groups.items())
-        ]
+        result = [{"date": k[0], "product": k[1], **v} for k, v in sorted(groups.items())]
     elif aggregation == "monthly_by_region":
         groups = defaultdict(lambda: {"units_sold": 0, "revenue": 0.0})
         for r in records:
             key = (r["date"], r["region"])
             groups[key]["units_sold"] += r["units_sold"]
             groups[key]["revenue"] += r["revenue"]
-        result = [
-            {"date": k[0], "region": k[1], **v}
-            for k, v in sorted(groups.items())
-        ]
+        result = [{"date": k[0], "region": k[1], **v} for k, v in sorted(groups.items())]
     elif aggregation == "total_by_product":
         groups = defaultdict(lambda: {"units_sold": 0, "revenue": 0.0})
         for r in records:
             groups[r["product"]]["units_sold"] += r["units_sold"]
             groups[r["product"]]["revenue"] += r["revenue"]
-        result = [
-            {"product": k, **v}
-            for k, v in sorted(groups.items())
-        ]
+        result = [{"product": k, **v} for k, v in sorted(groups.items())]
     else:
         result = records
 

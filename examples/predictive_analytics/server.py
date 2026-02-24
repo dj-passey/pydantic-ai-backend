@@ -121,9 +121,7 @@ async def websocket_chat(websocket: WebSocket):
 
                 message_history = result.all_messages()
 
-                await websocket.send_json(
-                    {"type": "response", "content": str(result.output)}
-                )
+                await websocket.send_json({"type": "response", "content": str(result.output)})
             except Exception as e:
                 logger.exception("Agent error")
                 await websocket.send_json({"type": "error", "content": str(e)})
@@ -183,7 +181,7 @@ async def _stream_model_request(websocket: WebSocket, node: Any, run: Any) -> No
         if final_result_found:
             previous = ""
             async for cumulative in request_stream.stream_text():
-                delta = cumulative[len(previous):]
+                delta = cumulative[len(previous) :]
                 if delta:
                     await websocket.send_json({"type": "text_delta", "content": delta})
                 previous = cumulative
@@ -211,7 +209,6 @@ async def _stream_tool_calls(websocket: WebSocket, node: Any, run: Any) -> None:
                     }
                 )
 
-
             elif isinstance(event, FunctionToolResultEvent):
                 tool_call_id = event.tool_call_id
                 tool_name = tool_names.get(tool_call_id, "unknown")
@@ -219,7 +216,7 @@ async def _stream_tool_calls(websocket: WebSocket, node: Any, run: Any) -> None:
 
                 # Intercept chart data
                 if result_str.startswith(CHART_DATA_PREFIX):
-                    chart_json = result_str[len(CHART_DATA_PREFIX):]
+                    chart_json = result_str[len(CHART_DATA_PREFIX) :]
                     try:
                         await websocket.send_json(
                             {"type": "chart_data", "data": json.loads(chart_json)}
