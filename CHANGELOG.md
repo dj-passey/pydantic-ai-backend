@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.12] - 2026-02-25
+
+### Added
+
+- **`DaytonaSandbox` — cloud sandbox backend** powered by [Daytona](https://daytona.io/) ephemeral sandboxes. Sub-90ms startup, no Docker daemon required. Install with `pip install pydantic-ai-backend[daytona]`.
+  - `execute()` via Daytona SDK `sandbox.process.exec()`
+  - `_read_bytes()` and `write()` use native Daytona file download/upload APIs (more efficient than shell for binary and large files)
+  - `edit()` via read → Python string replace → write (same pattern as `DockerSandbox`)
+  - `is_alive()`, `stop()`, automatic cleanup via `__del__`
+  - Auth: `DAYTONA_API_KEY` environment variable or `api_key=` constructor parameter
+  - Configurable `work_dir` (default: `/home/daytona`) and `startup_timeout`
+- New `[daytona]` optional dependency group: `daytona-sdk>=0.9.0`
+
+### Changed
+
+- **Extracted `BaseSandbox` to `backends/base.py`** — `BaseSandbox` is no longer defined inside `backends/docker/sandbox.py`. It now lives in its own module (`pydantic_ai_backends.backends.base`) since it's not Docker-specific. All existing import paths (`from pydantic_ai_backends import BaseSandbox`, `from pydantic_ai_backends.backends.docker import BaseSandbox`) remain fully backward compatible.
+
 ## [0.1.11] - 2026-02-24
 
 ### Changed

@@ -146,6 +146,7 @@ nav:
     - Backends: concepts/backends.md
     - Permissions: concepts/permissions.md
     - Docker Sandbox: concepts/docker.md
+    - Daytona Sandbox: concepts/daytona.md
     - Console Toolset: concepts/console-toolset.md
   - Examples:
     - examples/index.md

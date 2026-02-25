@@ -9,6 +9,7 @@ Backends provide file storage for your pydantic-ai agents. All backends implemen
 | `LocalBackend` | Persistent | Yes | CLI tools, local development |
 | `StateBackend` | Ephemeral | No | Unit testing, mocking |
 | `DockerSandbox` | Ephemeral* | Yes | Safe execution, multi-user |
+| `DaytonaSandbox` | Ephemeral | Yes | Cloud deployments, CI/CD |
 | `CompositeBackend` | Mixed | Depends | Route by path prefix |
 
 ## LocalBackend
@@ -378,6 +379,7 @@ backend.read("C:\\Windows\\...")   # Windows paths
 ## Next Steps
 
 - [Permissions](permissions.md) - Fine-grained access control
-- [Docker Sandbox](docker.md) - Isolated execution
+- [Docker Sandbox](docker.md) - Local isolated execution
+- [Daytona Sandbox](daytona.md) - Cloud isolated execution
 - [Console Toolset](console-toolset.md) - Ready-to-use tools
 - [API Reference](../api/backends.md) - Complete API
