@@ -64,6 +64,21 @@ toolset = create_console_toolset(id="my-console")
 toolset = create_console_toolset(default_ignore_hidden=False)
 ```
 
+## Custom Tool Descriptions
+
+You can override the default description of any tool with the `descriptions` parameter. This is useful when you want to tailor tool descriptions to your specific use case for better LLM behavior:
+
+```python
+toolset = create_console_toolset(
+    descriptions={
+        "execute": "Run shell commands in the workspace",
+        "read_file": "Read file contents from the workspace",
+    }
+)
+```
+
+Only the tools you specify are overridden; all others keep their built-in descriptions. Valid keys are: `ls`, `read_file`, `write_file`, `edit_file`, `hashline_edit`, `glob`, `grep`, `execute`.
+
 ## Permission-based Configuration
 
 For fine-grained control, use the permission system:

@@ -273,6 +273,7 @@ def create_console_toolset(  # noqa: C901
     image_support: bool = False,
     max_image_bytes: int = DEFAULT_MAX_IMAGE_BYTES,
     edit_format: EditFormat = "str_replace",
+    descriptions: dict[str, str] | None = None,
 ) -> FunctionToolset[ConsoleDeps]:
     """Create a console toolset for file operations and shell execution.
 
@@ -306,6 +307,11 @@ def create_console_toolset(  # noqa: C901
         edit_format: File editing format to use.  ``"str_replace"`` (default) uses
             exact string matching.  ``"hashline"`` tags each line with a content hash
             so models can reference lines by number:hash instead of reproducing text.
+        descriptions: Optional mapping of tool name to custom description override.
+            When provided, the description for a tool is looked up as
+            ``descriptions.get("tool_name", DEFAULT_DESCRIPTION)``.  Valid keys are:
+            ``ls``, ``read_file``, ``write_file``, ``edit_file``, ``hashline_edit``,
+            ``glob``, ``grep``, ``execute``.
 
     Returns:
         FunctionToolset with console tools.
@@ -336,6 +342,8 @@ def create_console_toolset(  # noqa: C901
     """
     from pydantic_ai.toolsets import FunctionToolset
 
+    _descs = descriptions or {}
+
     # Determine approval requirements
     write_approval = _requires_approval_from_ruleset(permissions, "write", require_write_approval)
     execute_approval = _requires_approval_from_ruleset(
@@ -344,7 +352,7 @@ def create_console_toolset(  # noqa: C901
 
     toolset: FunctionToolset[ConsoleDeps] = FunctionToolset(id=id, max_retries=max_retries)
 
-    @toolset.tool(description=LS_DESCRIPTION)
+    @toolset.tool(description=_descs.get("ls", LS_DESCRIPTION))
     async def ls(  # pragma: no cover
         ctx: RunContext[ConsoleDeps],
         path: str = ".",
@@ -373,7 +381,7 @@ def create_console_toolset(  # noqa: C901
     # --- read_file tool ---
     if edit_format == "hashline":
 
-        @toolset.tool(description=HASHLINE_READ_FILE_DESCRIPTION)
+        @toolset.tool(description=_descs.get("read_file", HASHLINE_READ_FILE_DESCRIPTION))
         async def read_file(  # pragma: no cover
             ctx: RunContext[ConsoleDeps],
             path: str,
@@ -413,7 +421,7 @@ def create_console_toolset(  # noqa: C901
 
     else:
 
-        @toolset.tool(description=READ_FILE_DESCRIPTION)
+        @toolset.tool(description=_descs.get("read_file", READ_FILE_DESCRIPTION))
         async def read_file(  # pragma: no cover
             ctx: RunContext[ConsoleDeps],
             path: str,
@@ -445,7 +453,7 @@ def create_console_toolset(  # noqa: C901
             return ctx.deps.backend.read(path, offset, limit)
 
     # --- write_file tool ---
-    @toolset.tool(description=WRITE_FILE_DESCRIPTION, requires_approval=write_approval)
+    @toolset.tool(description=_descs.get("write_file", WRITE_FILE_DESCRIPTION), requires_approval=write_approval)
     async def write_file(  # pragma: no cover
         ctx: RunContext[ConsoleDeps],
         path: str,
@@ -468,7 +476,7 @@ def create_console_toolset(  # noqa: C901
     # --- edit tool (str_replace or hashline) ---
     if edit_format == "hashline":
 
-        @toolset.tool(description=HASHLINE_EDIT_DESCRIPTION, requires_approval=write_approval)
+        @toolset.tool(description=_descs.get("hashline_edit", HASHLINE_EDIT_DESCRIPTION), requires_approval=write_approval)
         async def hashline_edit(  # pragma: no cover
             ctx: RunContext[ConsoleDeps],
             path: str,
@@ -523,7 +531,7 @@ of replacing it.
 
     else:
 
-        @toolset.tool(description=EDIT_FILE_DESCRIPTION, requires_approval=write_approval)
+        @toolset.tool(description=_descs.get("edit_file", EDIT_FILE_DESCRIPTION), requires_approval=write_approval)
         async def edit_file(  # pragma: no cover
             ctx: RunContext[ConsoleDeps],
             path: str,
@@ -548,7 +556,7 @@ the old_string must appear exactly once in the file.
 
             return f"Edited {result.path}: replaced {result.occurrences} occurrence(s)"
 
-    @toolset.tool(description=GLOB_DESCRIPTION)
+    @toolset.tool(description=_descs.get("glob", GLOB_DESCRIPTION))
     async def glob(  # pragma: no cover
         ctx: RunContext[ConsoleDeps],
         pattern: str,
@@ -574,7 +582,7 @@ the old_string must appear exactly once in the file.
 
         return "\n".join(lines)
 
-    @toolset.tool(description=GREP_DESCRIPTION)
+    @toolset.tool(description=_descs.get("grep", GREP_DESCRIPTION))
     async def grep(  # pragma: no cover
         ctx: RunContext[ConsoleDeps],
         pattern: str,
@@ -628,7 +636,7 @@ the old_string must appear exactly once in the file.
 
     if include_execute:
 
-        @toolset.tool(description=EXECUTE_DESCRIPTION, requires_approval=execute_approval)
+        @toolset.tool(description=_descs.get("execute", EXECUTE_DESCRIPTION), requires_approval=execute_approval)
         async def execute(  # pragma: no cover
             ctx: RunContext[ConsoleDeps],
             command: str,

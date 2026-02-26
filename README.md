@@ -153,6 +153,14 @@ toolset = create_console_toolset(
     require_write_approval=True,
     require_execute_approval=True,
 )
+
+# With custom tool descriptions
+toolset = create_console_toolset(
+    descriptions={
+        "execute": "Run shell commands in the workspace",
+        "read_file": "Read file contents from the workspace",
+    }
+)
 ```
 
 **Available tools:** `ls`, `read_file`, `write_file`, `edit_file`, `glob`, `grep`, `execute`
