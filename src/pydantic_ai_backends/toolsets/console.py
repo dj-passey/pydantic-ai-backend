@@ -453,7 +453,10 @@ def create_console_toolset(  # noqa: C901
             return ctx.deps.backend.read(path, offset, limit)
 
     # --- write_file tool ---
-    @toolset.tool(description=_descs.get("write_file", WRITE_FILE_DESCRIPTION), requires_approval=write_approval)
+    @toolset.tool(
+        description=_descs.get("write_file", WRITE_FILE_DESCRIPTION),
+        requires_approval=write_approval,
+    )
     async def write_file(  # pragma: no cover
         ctx: RunContext[ConsoleDeps],
         path: str,
@@ -476,7 +479,10 @@ def create_console_toolset(  # noqa: C901
     # --- edit tool (str_replace or hashline) ---
     if edit_format == "hashline":
 
-        @toolset.tool(description=_descs.get("hashline_edit", HASHLINE_EDIT_DESCRIPTION), requires_approval=write_approval)
+        @toolset.tool(
+            description=_descs.get("hashline_edit", HASHLINE_EDIT_DESCRIPTION),
+            requires_approval=write_approval,
+        )
         async def hashline_edit(  # pragma: no cover
             ctx: RunContext[ConsoleDeps],
             path: str,
@@ -531,7 +537,10 @@ of replacing it.
 
     else:
 
-        @toolset.tool(description=_descs.get("edit_file", EDIT_FILE_DESCRIPTION), requires_approval=write_approval)
+        @toolset.tool(
+            description=_descs.get("edit_file", EDIT_FILE_DESCRIPTION),
+            requires_approval=write_approval,
+        )
         async def edit_file(  # pragma: no cover
             ctx: RunContext[ConsoleDeps],
             path: str,
@@ -636,7 +645,10 @@ the old_string must appear exactly once in the file.
 
     if include_execute:
 
-        @toolset.tool(description=_descs.get("execute", EXECUTE_DESCRIPTION), requires_approval=execute_approval)
+        @toolset.tool(
+            description=_descs.get("execute", EXECUTE_DESCRIPTION),
+            requires_approval=execute_approval,
+        )
         async def execute(  # pragma: no cover
             ctx: RunContext[ConsoleDeps],
             command: str,
