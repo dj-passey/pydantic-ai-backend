@@ -275,11 +275,7 @@ class TestDockerSandboxReadTextHandling:
         fake_chardet = type(
             "FakeChardet",
             (),
-            {
-                "detect": staticmethod(
-                    lambda b: {"encoding": "utf-8", "confidence": 0.5}
-                )
-            },
+            {"detect": staticmethod(lambda b: {"encoding": "utf-8", "confidence": 0.5})},
         )()
         monkeypatch.setattr(sandbox_mod, "_get_chardet", lambda: fake_chardet)
 
