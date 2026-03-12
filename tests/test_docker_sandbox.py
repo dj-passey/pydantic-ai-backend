@@ -391,6 +391,6 @@ class TestDockerSandboxFilePathResolution:
 
     @pytest.mark.docker
     def test_read_bytes_nonexistent_path(self, docker_sandbox):
-        """_read_bytes on a non-existent path returns None."""
+        """_read_bytes on a non-existent path returns empty bytes."""
         result = docker_sandbox._read_bytes("/workspace/no_such_file.bin")
-        assert result is None
+        assert result == b""
