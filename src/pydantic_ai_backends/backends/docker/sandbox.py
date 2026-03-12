@@ -114,6 +114,12 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         """Alias for sandbox id, used for session management."""
         return self._id
 
+    def _resolve_path(self, path: str) -> str:
+        """Resolve relative paths against the container's working directory."""
+        if not PurePosixPath(path).is_absolute():
+            return str(PurePosixPath(self._work_dir) / path)
+        return path
+
     def _ensure_container(self) -> None:
         """Ensure Docker container is running."""
         if self._container is not None:
@@ -298,8 +304,10 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
             path: Path to the file in the container.
 
         Returns:
-            File content as bytes.
+            File content as bytes, or empty bytes if the file does not
+            exist or cannot be read.
         """
+        path = self._resolve_path(path)
         self._ensure_container()
         assert self._container is not None
 
@@ -307,25 +315,27 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
             # Use Docker get_archive to read file
             stream, stat = self._container.get_archive(path)
             raw_tar_bytes = b"".join(stream)
-        except Exception as e:
-            raise RuntimeError(f"Failed to read file: {e}") from e
+        except Exception:
+            return b""
 
         # Extract file from tar archive
-        with (
-            io.BytesIO(raw_tar_bytes) as tar_buffer,
-            tarfile.open(fileobj=tar_buffer, mode="r") as tar,
-        ):
-            member = next((m for m in tar.getmembers() if m.isfile()), None)
+        try:
+            with (
+                io.BytesIO(raw_tar_bytes) as tar_buffer,
+                tarfile.open(fileobj=tar_buffer, mode="r") as tar,
+            ):
+                member = next((m for m in tar.getmembers() if m.isfile()), None)
 
-            if not member:
-                return f"[Error: Path '{path}' exists but is empty or not a file.]".encode()
+                if not member:
+                    return b""
 
-            f = tar.extractfile(member)
-            if f is None:
-                return b"[Error: Could not extract file stream from archive]"
+                f = tar.extractfile(member)
+                if f is None:
+                    return b""
 
-            file_bytes = f.read()
-            return file_bytes
+                return f.read()
+        except Exception:
+            return b""
 
     def read(self, path: str, offset: int = 0, limit: int = 2000) -> str:
         """
@@ -336,9 +346,13 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
             offset: Start line index (for pagination).
             limit: Maximum number of lines to return.
         """
+        original_path = path
+        path = self._resolve_path(path)
         try:
             # Read raw bytes from file
             file_bytes = self._read_bytes(path)
+            if not file_bytes:
+                return f"Error: File '{original_path}' not found"
 
             # Convert bytes to string
             file_ext = Path(path).suffix.lower().lstrip(".")
@@ -513,14 +527,14 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         Returns:
             EditResult with path and occurrence count on success, or error message.
         """
+        original_path = path
+        path = self._resolve_path(path)
         try:
             # Read the file content
             file_bytes = self._read_bytes(path)
 
-            # Check for error messages from _read_bytes
-            if file_bytes.startswith(b"[Error:"):
-                error_msg = file_bytes.decode("utf-8", errors="replace")
-                return EditResult(error=error_msg)
+            if not file_bytes:
+                return EditResult(error=f"File '{original_path}' not found")
 
             # Decode to string using the same logic as read()
             file_ext = Path(path).suffix.lower().lstrip(".")
@@ -561,12 +575,13 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         large files and special characters reliably.
 
         Args:
-            path: Absolute path where the file should be written.
+            path: Path where the file should be written (absolute or relative to work_dir).
             content: File content as string or bytes.
 
         Returns:
             WriteResult with path on success, or error message on failure.
         """
+        path = self._resolve_path(path)
         self._ensure_container()
         assert self._container is not None
 

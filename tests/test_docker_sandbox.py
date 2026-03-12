@@ -263,20 +263,25 @@ class TestDockerSandboxReadTextHandling:
         result = sandbox._convert_bytes_to_text("cfg", b"whatever")
         assert result == decoded_value
 
-    def test_decode_unknown_text_binary_fallback(self):
+    def test_decode_unknown_text_binary_fallback(self, monkeypatch):
         """When no encoding decodes cleanly, binary marker should be returned."""
+        import pydantic_ai_backends.backends.docker.sandbox as sandbox_mod
         from pydantic_ai_backends import DockerSandbox
 
         sandbox = DockerSandbox.__new__(DockerSandbox)
 
-        # Crafted bytes with many decoding errors in common encodings
-        raw_bytes = bytearray(range(129, 255)) * 4  # lots of binary data
-        try:
+        # Force chardet to detect utf-8 so binary bytes produce many
+        # replacement characters and trigger the binary heuristic.
+        fake_chardet = type(
+            "FakeChardet",
+            (),
+            {"detect": staticmethod(lambda b: {"encoding": "utf-8", "confidence": 0.5})},
+        )()
+        monkeypatch.setattr(sandbox_mod, "_get_chardet", lambda: fake_chardet)
+
+        raw_bytes = bytearray(range(129, 255)) * 4
+        with pytest.raises(ValueError, match="Binary File"):
             sandbox._decode_unknown_text(raw_bytes)
-        except ValueError as e:
-            assert str(e) == "[Binary File]"
-        else:
-            raise AssertionError("Exception should have been raised.")
 
 
 class TestDockerSandboxGrepRaw:
@@ -302,3 +307,90 @@ class TestDockerSandboxGrepRaw:
         elapsed = time.monotonic() - start
         assert result == []
         assert elapsed < 5, f"grep_raw took {elapsed:.1f}s — likely searched / instead of ."
+
+
+class TestDockerSandboxResolvePath:
+    """Tests for _resolve_path helper (no Docker required)."""
+
+    def test_resolve_path_relative(self):
+        """Relative paths are resolved against work_dir."""
+        from pydantic_ai_backends import DockerSandbox
+
+        sandbox = DockerSandbox.__new__(DockerSandbox)
+        sandbox.__init__(work_dir="/workspace")
+
+        assert sandbox._resolve_path("file.txt") == "/workspace/file.txt"
+
+    def test_resolve_path_relative_nested(self):
+        """Nested relative paths are resolved against work_dir."""
+        from pydantic_ai_backends import DockerSandbox
+
+        sandbox = DockerSandbox.__new__(DockerSandbox)
+        sandbox.__init__(work_dir="/workspace")
+
+        assert sandbox._resolve_path("subdir/file.txt") == "/workspace/subdir/file.txt"
+
+    def test_resolve_path_absolute(self):
+        """Absolute paths pass through unchanged."""
+        from pydantic_ai_backends import DockerSandbox
+
+        sandbox = DockerSandbox.__new__(DockerSandbox)
+        sandbox.__init__(work_dir="/workspace")
+
+        assert sandbox._resolve_path("/custom/dir/file.txt") == "/custom/dir/file.txt"
+
+    def test_resolve_path_custom_work_dir(self):
+        """Relative paths resolve against a custom work_dir."""
+        from pydantic_ai_backends import DockerSandbox
+
+        sandbox = DockerSandbox.__new__(DockerSandbox)
+        sandbox.__init__(work_dir="/custom/workspace")
+
+        assert sandbox._resolve_path("file.txt") == "/custom/workspace/file.txt"
+
+
+class TestDockerSandboxFilePathResolution:
+    """Tests for file operations with relative and absolute paths (requires Docker)."""
+
+    @pytest.mark.docker
+    def test_read_file_absolute_path(self, docker_sandbox):
+        """Write to an absolute path and read it back with an absolute path."""
+        docker_sandbox.write("/custom/dir/file.txt", "absolute content")
+        content = docker_sandbox.read("/custom/dir/file.txt")
+        assert "absolute content" in content
+
+    @pytest.mark.docker
+    def test_read_file_relative_path(self, docker_sandbox):
+        """Write to work_dir and read with a relative path."""
+        docker_sandbox.write("/workspace/rel_test.txt", "relative content")
+        content = docker_sandbox.read("rel_test.txt")
+        assert "relative content" in content
+
+    @pytest.mark.docker
+    def test_write_file_relative_path(self, docker_sandbox):
+        """Write using a relative path and read back with absolute path."""
+        docker_sandbox.write("rel_write.txt", "written relatively")
+        content = docker_sandbox.read("/workspace/rel_write.txt")
+        assert "written relatively" in content
+
+    @pytest.mark.docker
+    def test_edit_file_relative_path(self, docker_sandbox):
+        """Edit a file using a relative path."""
+        docker_sandbox.write("edit_rel.txt", "old value")
+        result = docker_sandbox.edit("edit_rel.txt", "old value", "new value")
+        assert result.error is None
+        content = docker_sandbox.read("edit_rel.txt")
+        assert "new value" in content
+
+    @pytest.mark.docker
+    def test_read_file_nonexistent_path(self, docker_sandbox):
+        """Reading a non-existent file returns an error string, not a crash."""
+        content = docker_sandbox.read("/workspace/does_not_exist.txt")
+        assert "Error" in content
+        assert "not found" in content
+
+    @pytest.mark.docker
+    def test_read_bytes_nonexistent_path(self, docker_sandbox):
+        """_read_bytes on a non-existent path returns None."""
+        result = docker_sandbox._read_bytes("/workspace/no_such_file.bin")
+        assert result is None

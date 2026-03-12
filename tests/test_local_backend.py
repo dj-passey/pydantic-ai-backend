@@ -282,3 +282,67 @@ class TestLocalBackendExecute:
         result = backend.execute("pwd")
         assert result.exit_code == 0
         assert str(tmp_path) in result.output
+
+
+class TestLocalBackendPathResolution:
+    """Test LocalBackend path resolution and non-existent file handling."""
+
+    def test_read_file_absolute_path(self, tmp_path: Path):
+        """Read using a full absolute path."""
+        backend = LocalBackend(root_dir=tmp_path)
+        (tmp_path / "abs_test.txt").write_text("absolute content")
+
+        content = backend.read(str(tmp_path / "abs_test.txt"))
+        assert "absolute content" in content
+
+    def test_read_file_relative_path(self, tmp_path: Path):
+        """Read using a relative path, resolved from root_dir."""
+        backend = LocalBackend(root_dir=tmp_path)
+        (tmp_path / "rel_test.txt").write_text("relative content")
+
+        content = backend.read("rel_test.txt")
+        assert "relative content" in content
+
+    def test_read_file_nonexistent_no_crash(self, tmp_path: Path):
+        """Reading a non-existent file returns a graceful error string."""
+        backend = LocalBackend(root_dir=tmp_path)
+
+        content = backend.read("does_not_exist.txt")
+        assert "Error" in content
+        assert "not found" in content
+
+    def test_read_bytes_nonexistent(self, tmp_path: Path):
+        """_read_bytes returns empty bytes for a non-existent file."""
+        backend = LocalBackend(root_dir=tmp_path)
+
+        result = backend._read_bytes("no_such_file.bin")
+        assert result == b""
+
+    def test_read_bytes_nonexistent_absolute(self, tmp_path: Path):
+        """_read_bytes returns empty bytes for a non-existent absolute path."""
+        backend = LocalBackend(root_dir=tmp_path)
+
+        result = backend._read_bytes(str(tmp_path / "no_such_file.bin"))
+        assert result == b""
+
+    def test_write_and_read_relative_path(self, tmp_path: Path):
+        """Write and read using relative paths resolved from root_dir."""
+        backend = LocalBackend(root_dir=tmp_path)
+
+        result = backend.write("new_file.txt", "hello world")
+        assert result.error is None
+
+        content = backend.read("new_file.txt")
+        assert "hello world" in content
+
+    def test_custom_root_dir(self, tmp_path: Path):
+        """Paths resolve against a custom root_dir."""
+        custom_root = tmp_path / "custom" / "root"
+        custom_root.mkdir(parents=True)
+
+        backend = LocalBackend(root_dir=custom_root)
+        backend.write("test.txt", "custom root content")
+
+        assert (custom_root / "test.txt").read_text() == "custom root content"
+        content = backend.read("test.txt")
+        assert "custom root content" in content
