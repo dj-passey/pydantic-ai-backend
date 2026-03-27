@@ -66,6 +66,7 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         session_id: str | None = None,
         idle_timeout: int = 3600,
         volumes: dict[str, str] | None = None,
+        network_mode: str | None = None,
     ):
         """Initialize Docker sandbox.
 
@@ -79,6 +80,8 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
             idle_timeout: Timeout in seconds for idle cleanup (default: 1 hour).
             volumes: Host-to-container volume mappings for persistent storage.
                      Format: {"/host/path": "/container/path"}
+            network_mode: Docker network mode ("bridge", "none", "host",
+                         "container:<name|id>"). None uses Docker default.
         """
         # session_id is an alias for sandbox_id
         effective_id = session_id or sandbox_id
@@ -89,6 +92,7 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         self._idle_timeout = idle_timeout
         self._last_activity = time.time()
         self._volumes = volumes or {}
+        self._network_mode = network_mode
 
         # Handle runtime configuration
         if runtime is not None:
@@ -149,8 +153,7 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         for host_path, container_path in self._volumes.items():
             docker_volumes[host_path] = {"bind": container_path, "mode": "rw"}
 
-        self._container = client.containers.run(
-            image,
+        run_kwargs: dict[str, object] = dict(
             command="sleep infinity",
             detach=True,
             working_dir=self._work_dir,
@@ -158,6 +161,10 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
             environment=env_vars,
             volumes=docker_volumes if docker_volumes else None,
         )
+        if self._network_mode is not None:
+            run_kwargs["network_mode"] = self._network_mode
+
+        self._container = client.containers.run(image, **run_kwargs)
 
     def _ensure_runtime_image(self, client: object) -> str:
         """Ensure runtime image exists and return its name.
