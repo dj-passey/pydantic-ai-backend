@@ -437,7 +437,7 @@ def create_console_toolset(  # noqa: C901
                             f"({size_mb:.1f}MB, max {limit_mb:.1f}MB)"
                         )
                     media_type = IMAGE_MEDIA_TYPES.get(ext, "application/octet-stream")
-                    return BinaryContent(data=raw, media_type=media_type)  # type: ignore[call-arg]
+                    return BinaryContent(data=raw, media_type=media_type)  # pyright: ignore[reportCallIssue]
 
             from pydantic_ai_backends.hashline import format_hashline_output
 
@@ -477,7 +477,7 @@ def create_console_toolset(  # noqa: C901
                             f"({size_mb:.1f}MB, max {limit_mb:.1f}MB)"
                         )
                     media_type = IMAGE_MEDIA_TYPES.get(ext, "application/octet-stream")
-                    return BinaryContent(data=raw, media_type=media_type)  # type: ignore[call-arg]
+                    return BinaryContent(data=raw, media_type=media_type)  # pyright: ignore[reportCallIssue]
             return ctx.deps.backend.read(path, offset, limit)
 
     # --- write_file tool ---
