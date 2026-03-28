@@ -11,7 +11,7 @@ import tarfile
 import time
 from io import BytesIO
 from pathlib import Path, PurePosixPath
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pydantic_ai_backends.backends.base import (
     CODE_EXT,
@@ -153,7 +153,7 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         for host_path, container_path in self._volumes.items():
             docker_volumes[host_path] = {"bind": container_path, "mode": "rw"}
 
-        run_kwargs: dict[str, object] = dict(
+        run_kwargs: dict[str, Any] = dict(
             command="sleep infinity",
             detach=True,
             working_dir=self._work_dir,
