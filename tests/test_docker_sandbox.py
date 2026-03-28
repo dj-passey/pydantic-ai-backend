@@ -36,6 +36,7 @@ class TestDockerSandboxInit:
         assert sandbox._auto_remove is True
         assert sandbox._idle_timeout == 3600
         assert sandbox._volumes == {}
+        assert sandbox._network_mode is None
         assert sandbox._runtime is None
 
     def test_init_with_volumes(self):
@@ -94,6 +95,7 @@ class TestDockerSandboxInit:
             auto_remove=False,
             idle_timeout=7200,
             volumes=volumes,
+            network_mode="none",
         )
 
         assert sandbox._image == "python:3.11"
@@ -102,6 +104,25 @@ class TestDockerSandboxInit:
         assert sandbox._auto_remove is False
         assert sandbox._idle_timeout == 7200
         assert sandbox._volumes == volumes
+        assert sandbox._network_mode == "none"
+
+    def test_init_default_network_mode(self):
+        """Test default network_mode is None."""
+        from pydantic_ai_backends import DockerSandbox
+
+        sandbox = DockerSandbox.__new__(DockerSandbox)
+        sandbox.__init__()
+
+        assert sandbox._network_mode is None
+
+    def test_init_with_network_mode(self):
+        """Test initialization with network_mode parameter."""
+        from pydantic_ai_backends import DockerSandbox
+
+        sandbox = DockerSandbox.__new__(DockerSandbox)
+        sandbox.__init__(network_mode="none")
+
+        assert sandbox._network_mode == "none"
 
     def test_init_with_session_id_alias(self):
         """Test that session_id works as alias for sandbox_id."""
@@ -394,3 +415,23 @@ class TestDockerSandboxFilePathResolution:
         """_read_bytes on a non-existent path returns empty bytes."""
         result = docker_sandbox._read_bytes("/workspace/no_such_file.bin")
         assert result == b""
+
+
+class TestDockerSandboxNetworkMode:
+    """Tests for DockerSandbox network_mode parameter."""
+
+    @pytest.mark.docker
+    def test_network_mode_none_disables_networking(self):
+        """Test that network_mode='none' prevents network access."""
+        pytest.importorskip("docker")
+        from pydantic_ai_backends import DockerSandbox
+
+        sandbox = DockerSandbox(network_mode="none")
+        try:
+            result = sandbox.execute(
+                "python -c \"import urllib.request; urllib.request.urlopen('http://example.com')\"",
+                timeout=10,
+            )
+            assert result.exit_code != 0
+        finally:
+            sandbox.stop()
