@@ -167,6 +167,8 @@ _LAZY_IMPORTS = {
     "SECRETS_PATTERNS": "pydantic_ai_backends.permissions",
     "SYSTEM_PATTERNS": "pydantic_ai_backends.permissions",
     "create_ruleset": "pydantic_ai_backends.permissions",
+    # Capability (requires pydantic-ai with capabilities)
+    "ConsoleCapability": "pydantic_ai_backends.capability",
 }
 
 
@@ -249,6 +251,8 @@ __all__ = [
     "SECRETS_PATTERNS",
     "SYSTEM_PATTERNS",
     "create_ruleset",
+    # Capability (requires pydantic-ai with capabilities)
+    "ConsoleCapability",
 ]
 
 try:

@@ -26,9 +26,30 @@ Console Toolset, Docker Sandbox, and Permission System for [Pydantic AI](https:/
 
 </div>
 
-## Quick Start
+## Quick Start (Capability API)
 
-Add file and execution capabilities to any pydantic-ai agent:
+The recommended way to add filesystem tools:
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_backends import ConsoleCapability
+
+agent = Agent("openai:gpt-4.1", capabilities=[ConsoleCapability()])
+```
+
+### With Permissions
+
+```python
+from pydantic_ai_backends import ConsoleCapability
+from pydantic_ai_backends.permissions import READONLY_RULESET
+
+# Read-only agent — write/edit/execute tools hidden from model
+agent = Agent("openai:gpt-4.1", capabilities=[
+    ConsoleCapability(permissions=READONLY_RULESET),
+])
+```
+
+### Alternative: Toolset API
 
 ```python
 from dataclasses import dataclass
@@ -39,18 +60,7 @@ from pydantic_ai_backends import LocalBackend, create_console_toolset
 class Deps:
     backend: LocalBackend
 
-agent = Agent(
-    "openai:gpt-4o",
-    deps_type=Deps,
-    toolsets=[create_console_toolset()],
-)
-
-backend = LocalBackend(root_dir="/workspace")
-result = agent.run_sync(
-    "Create a fibonacci.py script and run it",
-    deps=Deps(backend=backend),
-)
-print(result.output)
+agent = Agent("openai:gpt-4.1", deps_type=Deps, toolsets=[create_console_toolset()])
 ```
 
 ## Choose Your Backend
