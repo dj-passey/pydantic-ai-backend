@@ -262,6 +262,26 @@ def _requires_approval_from_ruleset(
     return op_perms.default == "ask"
 
 
+def _is_denied_by_ruleset(
+    ruleset: PermissionRuleset | None,
+    operation: str,
+) -> bool:
+    """Check if an operation is denied by the ruleset.
+
+    Returns True when the operation's default action is "deny",
+    meaning the corresponding tools should not be registered at all.
+    """
+    from pydantic_ai_backends.permissions.types import OperationPermissions
+
+    if ruleset is None:
+        return False
+
+    op_perms: OperationPermissions | None = getattr(ruleset, operation, None)
+    if op_perms is None:
+        return ruleset.default == "deny"
+    return op_perms.default == "deny"
+
+
 def create_console_toolset(  # noqa: C901
     id: str | None = None,
     include_execute: bool = True,
@@ -344,11 +364,19 @@ def create_console_toolset(  # noqa: C901
 
     _descs = descriptions or {}
 
-    # Determine approval requirements
+    # Determine approval requirements and denied operations
     write_approval = _requires_approval_from_ruleset(permissions, "write", require_write_approval)
     execute_approval = _requires_approval_from_ruleset(
         permissions, "execute", require_execute_approval
     )
+    # Track denied operations to remove tools after registration
+    _denied_tools: set[str] = set()
+    if _is_denied_by_ruleset(permissions, "write"):
+        _denied_tools.add("write_file")
+    if _is_denied_by_ruleset(permissions, "edit"):
+        _denied_tools.update({"edit_file", "hashline_edit"})
+    if _is_denied_by_ruleset(permissions, "execute"):
+        _denied_tools.add("execute")
 
     toolset: FunctionToolset[ConsoleDeps] = FunctionToolset(id=id, max_retries=max_retries)
 
@@ -409,7 +437,7 @@ def create_console_toolset(  # noqa: C901
                             f"({size_mb:.1f}MB, max {limit_mb:.1f}MB)"
                         )
                     media_type = IMAGE_MEDIA_TYPES.get(ext, "application/octet-stream")
-                    return BinaryContent(data=raw, media_type=media_type)
+                    return BinaryContent(data=raw, media_type=media_type)  # pyright: ignore[reportCallIssue]
 
             from pydantic_ai_backends.hashline import format_hashline_output
 
@@ -449,7 +477,7 @@ def create_console_toolset(  # noqa: C901
                             f"({size_mb:.1f}MB, max {limit_mb:.1f}MB)"
                         )
                     media_type = IMAGE_MEDIA_TYPES.get(ext, "application/octet-stream")
-                    return BinaryContent(data=raw, media_type=media_type)
+                    return BinaryContent(data=raw, media_type=media_type)  # pyright: ignore[reportCallIssue]
             return ctx.deps.backend.read(path, offset, limit)
 
     # --- write_file tool ---
@@ -684,6 +712,10 @@ for long-running builds or test suites.
                 return f"Command failed (exit code {result.exit_code}):\n{output}"
 
             return str(output)
+
+    # Remove tools for denied operations (fixes issue #23)
+    for tool_name in _denied_tools:
+        toolset.tools.pop(tool_name, None)
 
     return toolset
 

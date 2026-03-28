@@ -61,7 +61,28 @@ pip install pydantic-ai-backend[docker]
 pip install pydantic-ai-backend[console,docker]
 ```
 
-## Quick Start
+## Quick Start — ConsoleCapability (Recommended)
+
+The simplest way to give your agent filesystem tools:
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai_backends import ConsoleCapability
+
+agent = Agent("openai:gpt-4.1", capabilities=[ConsoleCapability()])
+```
+
+### With Permissions
+
+```python
+from pydantic_ai_backends import ConsoleCapability
+from pydantic_ai_backends.permissions import READONLY_RULESET
+
+# Read-only agent — write/edit/execute tools are hidden from the model
+agent = Agent("openai:gpt-4.1", capabilities=[ConsoleCapability(permissions=READONLY_RULESET)])
+```
+
+### Alternative: Toolset API
 
 ```python
 from dataclasses import dataclass
@@ -73,7 +94,7 @@ class Deps:
     backend: LocalBackend
 
 agent = Agent(
-    "openai:gpt-4o",
+    "openai:gpt-4.1",
     deps_type=Deps,
     toolsets=[create_console_toolset()],
 )

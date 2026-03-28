@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-03-26
+
+### Added
+
+- **`ConsoleCapability`** — new pydantic-ai [capability](https://ai.pydantic.dev/capabilities/) that bundles console tools + instructions + permission enforcement:
+  ```python
+  from pydantic_ai import Agent
+  from pydantic_ai_backends import ConsoleCapability
+  from pydantic_ai_backends.permissions import READONLY_RULESET
+
+  agent = Agent("openai:gpt-4.1", capabilities=[ConsoleCapability(permissions=READONLY_RULESET)])
+  ```
+  - Registers all tools automatically (ls, read_file, write_file, edit_file, glob, grep, execute)
+  - Injects console system prompt
+  - **Fixes [#23](https://github.com/vstorm-co/pydantic-ai-backend/issues/23)**: `READONLY_RULESET` now actually blocks writes — `prepare_tools` hides denied tools from the model entirely, `before_tool_execute` checks per-path permissions
+
+### Fixed
+
+- **`create_console_toolset` with `READONLY_RULESET` now actually blocks writes** — previously `write=deny` in a ruleset only set `requires_approval=False` (because `"deny" != "ask"`), so tools were registered normally and the agent could write freely. Now tools for denied operations are removed from the toolset entirely. ([#23](https://github.com/vstorm-co/pydantic-ai-backend/issues/23), reported by [@dj-passey](https://github.com/dj-passey))
+
+### Changed
+
+- **Minimum pydantic-ai version bumped to `>=1.71.0`** (capabilities API support)
+
 ## [0.1.14] - 2026-03-11
 
 ### Fixed
