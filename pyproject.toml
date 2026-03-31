@@ -1,6 +1,6 @@
 [project]
 name = "pydantic-ai-backend"
-version = "0.2.1"
+version = "0.2.2"
 description = "File storage and sandbox backends for AI agents"
 readme = "README.md"
 license = "MIT"
@@ -27,7 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 console = [
-    "pydantic-ai-slim>=1.71.0",
+    "pydantic-ai-slim>=1.74.0",
 ]
 daytona = [
     "daytona-sdk>=0.9.0",
@@ -38,7 +38,7 @@ docker = [
     "chardet>=5.2.0",
 ]
 dev = [
-    "pydantic-ai-slim>=1.71.0",
+    "pydantic-ai-slim>=1.74.0",
     "pytest>=9.0.0",
     "pytest-asyncio>=0.23.0",
     "pytest-cov>=7.0.0",
