@@ -587,7 +587,9 @@ including whitespace and indentation.
                 replace_all: If True, replace all occurrences. If False (default), \
 the old_string must appear exactly once in the file.
             """
-            result = await asyncio.to_thread(ctx.deps.backend.edit, path, old_string, new_string, replace_all)
+            result = await asyncio.to_thread(
+                ctx.deps.backend.edit, path, old_string, new_string, replace_all
+            )
 
             if result.error:
                 return f"Error: {result.error}"
@@ -638,7 +640,9 @@ the old_string must appear exactly once in the file.
             output_mode: Output format — `"content"`, `"files_with_matches"`, or `"count"`.
             ignore_hidden: Whether to skip hidden files/directories.
         """
-        result = await asyncio.to_thread(ctx.deps.backend.grep_raw, pattern, path, glob_pattern, ignore_hidden)
+        result = await asyncio.to_thread(
+            ctx.deps.backend.grep_raw, pattern, path, glob_pattern, ignore_hidden
+        )
 
         if isinstance(result, str):
             return result  # Error message
