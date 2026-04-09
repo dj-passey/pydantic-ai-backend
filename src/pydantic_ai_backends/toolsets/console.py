@@ -32,7 +32,12 @@ DEFAULT_MAX_IMAGE_BYTES: int = 50 * 1024 * 1024
 if TYPE_CHECKING:
     from pydantic_ai.toolsets import FunctionToolset
 
-    from pydantic_ai_backends.permissions.types import PermissionRuleset
+    from pydantic_ai_backends.permissions.checker import PermissionChecker
+    from pydantic_ai_backends.permissions.types import PermissionOperation, PermissionRuleset
+
+_CONSOLE_PERMISSION_OPS = frozenset(
+    {"read", "write", "edit", "execute", "ls", "glob", "grep"},
+)
 
 
 CONSOLE_SYSTEM_PROMPT = """\
@@ -263,14 +268,39 @@ def _requires_approval_from_ruleset(
     return op_perms.default == "ask"
 
 
+def _reject_ruleset_per_path_ask(ruleset: PermissionRuleset) -> None:
+    """Raise NotImplementedError if any operation uses per-path 'ask' rules.
+
+    Current implementation supports ask rules at the operation level only,
+    not per-path.
+    """
+    from pydantic_ai_backends.permissions.types import OperationPermissions
+
+    for op in _CONSOLE_PERMISSION_OPS:
+        op_perms: OperationPermissions | None = getattr(ruleset, op, None)
+        if op_perms is None:
+            continue
+        if op_perms.default == "ask":
+            continue
+        for rule in op_perms.rules:
+            if rule.action == "ask":
+                msg = (
+                    f"Per-path 'ask' rules are not supported for operation {op!r} "
+                    f"(found rule pattern {rule.pattern!r}). Use "
+                    f"OperationPermissions(default='ask') for whole-tool approval, "
+                    f"or use only 'allow'/'deny' in rules."
+                )
+                raise NotImplementedError(msg)
+
+
 def _is_denied_by_ruleset(
     ruleset: PermissionRuleset | None,
     operation: str,
 ) -> bool:
-    """Check if an operation is denied by the ruleset.
+    """Return True if the operation should omit console tools entirely.
 
-    Returns True when the operation's default action is "deny",
-    meaning the corresponding tools should not be registered at all.
+    Returns True only when the operation's default action is "deny",
+    and there is no "allow" rule that could permit a path.
     """
     from pydantic_ai_backends.permissions.types import OperationPermissions
 
@@ -280,7 +310,57 @@ def _is_denied_by_ruleset(
     op_perms: OperationPermissions | None = getattr(ruleset, operation, None)
     if op_perms is None:
         return ruleset.default == "deny"
-    return op_perms.default == "deny"
+    if op_perms.default != "deny":
+        return False
+    return not any(rule.action == "allow" for rule in op_perms.rules)
+
+
+def _evaluate_toolset_permission(
+    checker: PermissionChecker,
+    backend: BackendProtocol,
+    operation: PermissionOperation,
+    target: str,
+) -> str | None:
+    """Return an error message if the toolset-level check denies, else None.
+
+    Skips when the backend already has a ``permission_checker`` (LocalBackend).
+    When the ruleset resolves to `ask`` without an ``ask_callback``, raises
+    ``PermissionError`` (``ask_fallback=\"error\"`` on ``PermissionChecker``).
+    """
+    from pydantic_ai_backends.permissions.checker import PermissionError
+
+    if getattr(backend, "permission_checker", None) is not None:
+        return None
+
+    action = checker.check_sync(operation, target)
+    if action == "allow":
+        return None
+    if action == "deny":
+        rule = checker._find_matching_rule(operation, target)
+        if rule and rule.description:
+            return f"Permission denied: {rule.description}"
+        return f"Permission denied for {operation} on '{target}'"
+    raise PermissionError(operation, target, "Approval required but no callback")
+
+
+def _toolset_permission_prefix_error(
+    checker: PermissionChecker | None,
+    backend: BackendProtocol,
+    operation: PermissionOperation,
+    target: str,
+) -> str | None:
+    """Return ``Error: ...`` string or None. Catches ``PermissionError``."""
+    from pydantic_ai_backends.permissions.checker import PermissionError
+
+    if checker is None:
+        return None
+    try:
+        msg = _evaluate_toolset_permission(checker, backend, operation, target)
+    except PermissionError as e:
+        return f"Error: {e}"
+    if msg:
+        return f"Error: {msg}"
+    return None
 
 
 def create_console_toolset(  # noqa: C901
@@ -314,6 +394,12 @@ def create_console_toolset(  # noqa: C901
         permissions: Optional permission ruleset to determine tool approval requirements.
             If provided, overrides require_write_approval and require_execute_approval
             based on whether the operation's default action is "ask".
+            Enforced inside tools when the backend has no `permission_checker`
+            (e.g. DockerSandbox). Rules cannot use per-path action='ask' unless
+            that operation's default is also 'ask'.
+            If a path resolves to ``ask`` without an ``ask_callback``, tools
+            return an error string from ``PermissionError`` (``ask_fallback=\"error\"``
+            on the internal ``PermissionChecker``).
         max_retries: Maximum number of retries for each tool during a run.
             When the model sends invalid arguments (e.g. missing required fields),
             the validation error is fed back and the model can retry up to this
@@ -363,7 +449,20 @@ def create_console_toolset(  # noqa: C901
     """
     from pydantic_ai.toolsets import FunctionToolset
 
+    from pydantic_ai_backends.permissions.checker import PermissionChecker
+
     _descs = descriptions or {}
+
+    if permissions is not None:
+        _reject_ruleset_per_path_ask(permissions)
+
+    toolset_checker: PermissionChecker | None = None
+    if permissions is not None:
+        toolset_checker = PermissionChecker(
+            ruleset=permissions,
+            ask_callback=None,
+            ask_fallback="error",
+        )
 
     # Determine approval requirements and denied operations
     write_approval = _requires_approval_from_ruleset(permissions, "write", require_write_approval)
@@ -391,6 +490,10 @@ def create_console_toolset(  # noqa: C901
         Args:
             path: Directory path to list. Defaults to current directory.
         """
+        err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "ls", path)
+        if err:
+            return err
+
         entries = await asyncio.to_thread(ctx.deps.backend.ls_info, path)
 
         if not entries:
@@ -427,6 +530,11 @@ def create_console_toolset(  # noqa: C901
             if image_support:
                 ext = path.rsplit(".", 1)[-1].lower() if "." in path else ""
                 if ext in IMAGE_EXTENSIONS:
+                    err = _toolset_permission_prefix_error(
+                        toolset_checker, ctx.deps.backend, "read", path
+                    )
+                    if err:
+                        return err
                     raw = await asyncio.to_thread(ctx.deps.backend._read_bytes, path)
                     if not raw:
                         return f"Error: Image file '{path}' not found or empty"
@@ -439,6 +547,10 @@ def create_console_toolset(  # noqa: C901
                         )
                     media_type = IMAGE_MEDIA_TYPES.get(ext, "application/octet-stream")
                     return BinaryContent(data=raw, media_type=media_type)  # pyright: ignore[reportCallIssue]
+
+            err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "read", path)
+            if err:
+                return err
 
             from pydantic_ai_backends.hashline import format_hashline_output
 
@@ -467,6 +579,11 @@ def create_console_toolset(  # noqa: C901
             if image_support:
                 ext = path.rsplit(".", 1)[-1].lower() if "." in path else ""
                 if ext in IMAGE_EXTENSIONS:
+                    err = _toolset_permission_prefix_error(
+                        toolset_checker, ctx.deps.backend, "read", path
+                    )
+                    if err:
+                        return err
                     raw = await asyncio.to_thread(ctx.deps.backend._read_bytes, path)
                     if not raw:
                         return f"Error: Image file '{path}' not found or empty"
@@ -479,6 +596,9 @@ def create_console_toolset(  # noqa: C901
                         )
                     media_type = IMAGE_MEDIA_TYPES.get(ext, "application/octet-stream")
                     return BinaryContent(data=raw, media_type=media_type)  # pyright: ignore[reportCallIssue]
+            err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "read", path)
+            if err:
+                return err
             return await asyncio.to_thread(ctx.deps.backend.read, path, offset, limit)
 
     # --- write_file tool ---
@@ -497,6 +617,10 @@ def create_console_toolset(  # noqa: C901
             path: Path to the file to write.
             content: Complete content to write to the file.
         """
+        err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "write", path)
+        if err:
+            return err
+
         result = await asyncio.to_thread(ctx.deps.backend.write, path, content)
 
         if result.error:
@@ -534,6 +658,10 @@ def create_console_toolset(  # noqa: C901
                 insert_after: If True, insert new_content after start_line instead \
 of replacing it.
             """
+            err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "edit", path)
+            if err:
+                return err
+
             from pydantic_ai_backends.hashline import apply_hashline_edit_with_summary
 
             # Read current file content
@@ -587,6 +715,10 @@ including whitespace and indentation.
                 replace_all: If True, replace all occurrences. If False (default), \
 the old_string must appear exactly once in the file.
             """
+            err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "edit", path)
+            if err:
+                return err
+
             result = await asyncio.to_thread(
                 ctx.deps.backend.edit, path, old_string, new_string, replace_all
             )
@@ -608,6 +740,10 @@ the old_string must appear exactly once in the file.
             pattern: Glob pattern to match.
             path: Base directory to search from. Defaults to current directory.
         """
+        err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "glob", path)
+        if err:
+            return err
+
         entries = await asyncio.to_thread(ctx.deps.backend.glob_info, pattern, path)
 
         if not entries:
@@ -640,6 +776,13 @@ the old_string must appear exactly once in the file.
             output_mode: Output format — `"content"`, `"files_with_matches"`, or `"count"`.
             ignore_hidden: Whether to skip hidden files/directories.
         """
+        grep_target = path if path is not None else "."
+        err = _toolset_permission_prefix_error(
+            toolset_checker, ctx.deps.backend, "grep", grep_target
+        )
+        if err:
+            return err
+
         result = await asyncio.to_thread(
             ctx.deps.backend.grep_raw, pattern, path, glob_pattern, ignore_hidden
         )
@@ -703,6 +846,10 @@ for long-running builds or test suites.
             # Check if execute is enabled (for LocalBackend)
             if hasattr(backend, "execute_enabled") and not backend.execute_enabled:  # pyright: ignore[reportAttributeAccessIssue]
                 return "Error: Shell execution is disabled for this backend"
+
+            err = _toolset_permission_prefix_error(toolset_checker, backend, "execute", command)
+            if err:
+                return err
 
             try:
                 result = await asyncio.to_thread(backend.execute, command, timeout)  # pyright: ignore[reportAttributeAccessIssue]
