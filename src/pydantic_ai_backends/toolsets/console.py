@@ -323,9 +323,9 @@ def _evaluate_toolset_permission(
 ) -> str | None:
     """Return an error message if the toolset-level check denies, else None.
 
-    Skips when the backend already has a ``permission_checker`` (LocalBackend).
-    When the ruleset resolves to `ask`` without an ``ask_callback``, raises
-    ``PermissionError`` (``ask_fallback=\"error\"`` on ``PermissionChecker``).
+    Skips when the backend already has a `permission_checker` (LocalBackend).
+    When the ruleset resolves to `ask` without an `ask_callback`, raises
+    `PermissionError` (`ask_fallback="error"` on `PermissionChecker`).
     """
     from pydantic_ai_backends.permissions.checker import PermissionError
 
@@ -397,9 +397,8 @@ def create_console_toolset(  # noqa: C901
             Enforced inside tools when the backend has no `permission_checker`
             (e.g. DockerSandbox). Rules cannot use per-path action='ask' unless
             that operation's default is also 'ask'.
-            If a path resolves to ``ask`` without an ``ask_callback``, tools
-            return an error string from ``PermissionError`` (``ask_fallback=\"error\"``
-            on the internal ``PermissionChecker``).
+            If a path resolves to `ask` without an `ask_callback`, tools
+            return an error string from `PermissionError`.
         max_retries: Maximum number of retries for each tool during a run.
             When the model sends invalid arguments (e.g. missing required fields),
             the validation error is fed back and the model can retry up to this
@@ -490,7 +489,9 @@ def create_console_toolset(  # noqa: C901
         Args:
             path: Directory path to list. Defaults to current directory.
         """
-        err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "ls", path)
+        err = _toolset_permission_prefix_error(
+            toolset_checker, ctx.deps.backend, "ls", path
+        )
         if err:
             return err
 
@@ -531,8 +532,7 @@ def create_console_toolset(  # noqa: C901
                 ext = path.rsplit(".", 1)[-1].lower() if "." in path else ""
                 if ext in IMAGE_EXTENSIONS:
                     err = _toolset_permission_prefix_error(
-                        toolset_checker, ctx.deps.backend, "read", path
-                    )
+                        toolset_checker, ctx.deps.backend, "read", path)
                     if err:
                         return err
                     raw = await asyncio.to_thread(ctx.deps.backend._read_bytes, path)
@@ -548,7 +548,8 @@ def create_console_toolset(  # noqa: C901
                     media_type = IMAGE_MEDIA_TYPES.get(ext, "application/octet-stream")
                     return BinaryContent(data=raw, media_type=media_type)  # pyright: ignore[reportCallIssue]
 
-            err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "read", path)
+            err = _toolset_permission_prefix_error(
+                toolset_checker, ctx.deps.backend, "read", path)
             if err:
                 return err
 
@@ -580,8 +581,7 @@ def create_console_toolset(  # noqa: C901
                 ext = path.rsplit(".", 1)[-1].lower() if "." in path else ""
                 if ext in IMAGE_EXTENSIONS:
                     err = _toolset_permission_prefix_error(
-                        toolset_checker, ctx.deps.backend, "read", path
-                    )
+                        toolset_checker, ctx.deps.backend, "read", path)
                     if err:
                         return err
                     raw = await asyncio.to_thread(ctx.deps.backend._read_bytes, path)
@@ -596,7 +596,8 @@ def create_console_toolset(  # noqa: C901
                         )
                     media_type = IMAGE_MEDIA_TYPES.get(ext, "application/octet-stream")
                     return BinaryContent(data=raw, media_type=media_type)  # pyright: ignore[reportCallIssue]
-            err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "read", path)
+            err = _toolset_permission_prefix_error(
+                toolset_checker, ctx.deps.backend, "read", path)
             if err:
                 return err
             return await asyncio.to_thread(ctx.deps.backend.read, path, offset, limit)
@@ -617,7 +618,9 @@ def create_console_toolset(  # noqa: C901
             path: Path to the file to write.
             content: Complete content to write to the file.
         """
-        err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "write", path)
+        err = _toolset_permission_prefix_error(
+            toolset_checker, ctx.deps.backend, "write", path
+        )
         if err:
             return err
 
@@ -658,7 +661,8 @@ def create_console_toolset(  # noqa: C901
                 insert_after: If True, insert new_content after start_line instead \
 of replacing it.
             """
-            err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "edit", path)
+            err = _toolset_permission_prefix_error(
+                toolset_checker, ctx.deps.backend, "edit", path)
             if err:
                 return err
 
@@ -715,7 +719,8 @@ including whitespace and indentation.
                 replace_all: If True, replace all occurrences. If False (default), \
 the old_string must appear exactly once in the file.
             """
-            err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "edit", path)
+            err = _toolset_permission_prefix_error(
+                toolset_checker, ctx.deps.backend, "edit", path)
             if err:
                 return err
 
@@ -740,7 +745,9 @@ the old_string must appear exactly once in the file.
             pattern: Glob pattern to match.
             path: Base directory to search from. Defaults to current directory.
         """
-        err = _toolset_permission_prefix_error(toolset_checker, ctx.deps.backend, "glob", path)
+        err = _toolset_permission_prefix_error(
+            toolset_checker, ctx.deps.backend, "glob", path
+        )
         if err:
             return err
 
@@ -847,7 +854,9 @@ for long-running builds or test suites.
             if hasattr(backend, "execute_enabled") and not backend.execute_enabled:  # pyright: ignore[reportAttributeAccessIssue]
                 return "Error: Shell execution is disabled for this backend"
 
-            err = _toolset_permission_prefix_error(toolset_checker, backend, "execute", command)
+            err = _toolset_permission_prefix_error(
+                toolset_checker, backend, "execute", command
+            )
             if err:
                 return err
 
