@@ -93,7 +93,10 @@ class TestSessionManager:
 
     def test_init_with_factory(self):
         """Test initialization with custom sandbox factory."""
-        factory = lambda sid: MockCustomSandbox(sid)
+
+        def factory(sid: str) -> MockCustomSandbox:
+            return MockCustomSandbox(sid)
+
         manager = SessionManager(sandbox_factory=factory)
         assert manager._sandbox_factory is factory
 
