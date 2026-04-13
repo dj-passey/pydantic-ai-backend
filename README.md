@@ -156,6 +156,20 @@ sandbox.start()
 sandbox.stop()
 ```
 
+### Reusable Named Container
+
+```python
+from pydantic_ai_backends import DockerSandbox
+
+# Named container persists between sessions (packages survive restarts)
+sandbox = DockerSandbox(
+    image="python:3.12-slim",
+    container_name="my-dev-env",  # implies auto_remove=False
+    volumes={"/my/project": "/workspace"},
+)
+# Next time: finds existing container and reattaches
+```
+
 ## Console Toolset
 
 Ready-to-use tools for pydantic-ai agents:
@@ -251,12 +265,27 @@ Multi-user web applications:
 ```python
 from pydantic_ai_backends import SessionManager
 
+# Docker (default)
 manager = SessionManager(
     default_runtime="python-datascience",
     workspace_root="/app/workspaces",
 )
 
 # Each user gets isolated sandbox
+sandbox = await manager.get_or_create("user-123")
+```
+
+### Custom Sandbox Factory
+
+Use any sandbox backend (Daytona, custom, etc.):
+
+```python
+from pydantic_ai_backends import SessionManager, DaytonaSandbox
+
+def daytona_factory(session_id: str) -> DaytonaSandbox:
+    return DaytonaSandbox(sandbox_id=session_id)
+
+manager = SessionManager(sandbox_factory=daytona_factory)
 sandbox = await manager.get_or_create("user-123")
 ```
 

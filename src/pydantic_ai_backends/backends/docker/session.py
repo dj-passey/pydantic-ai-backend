@@ -1,23 +1,28 @@
-"""Session management for Docker sandboxes.
+"""Session management for sandbox backends.
 
-This module provides session management for multi-user applications,
-allowing multiple users to have their own isolated Docker containers.
+Provides session management for multi-user applications,
+allowing multiple users to have their own isolated sandboxes
+(Docker, Daytona, or any custom sandbox type).
 
-Example:
+Example with default Docker backend:
     ```python
-    from pydantic_ai_backends import SessionManager, RuntimeConfig
+    from pydantic_ai_backends import SessionManager
 
-    # Create a session manager with default runtime
     manager = SessionManager(default_runtime="python-datascience")
-
-    # Get or create a sandbox for a user session
     sandbox = await manager.get_or_create("user-123")
-
-    # Use the sandbox...
     result = sandbox.execute("python script.py")
-
-    # Release when done
     await manager.release("user-123")
+    ```
+
+Example with custom factory:
+    ```python
+    from pydantic_ai_backends import SessionManager, DaytonaSandbox
+
+    def daytona_factory(session_id: str) -> DaytonaSandbox:
+        return DaytonaSandbox(sandbox_id=session_id)
+
+    manager = SessionManager(sandbox_factory=daytona_factory)
+    sandbox = await manager.get_or_create("user-123")
     ```
 """
 
@@ -25,40 +30,49 @@ from __future__ import annotations
 
 import asyncio
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from pydantic_ai_backends.backends.docker.sandbox import DockerSandbox
     from pydantic_ai_backends.types import RuntimeConfig
+
+#: Factory callable: receives ``session_id`` and returns a sandbox instance.
+SandboxFactory = Callable[[str], Any]
 
 
 class SessionManager:
-    """Manages user sessions and their Docker containers.
+    """Manages user sessions and their sandbox containers.
 
-    This class provides a way to manage multiple Docker sandbox instances
+    This class provides a way to manage multiple sandbox instances
     for different user sessions. It handles:
+
     - Creating new sandboxes for new sessions
     - Reusing existing sandboxes for returning sessions
     - Cleaning up idle sessions automatically
+
+    By default, sandboxes are created using :class:`DockerSandbox`.
+    Pass a ``sandbox_factory`` callable to use a different backend
+    (e.g. :class:`DaytonaSandbox` or a custom implementation).
 
     Example:
         ```python
         from pydantic_ai_backends import SessionManager
 
+        # Docker (default)
         manager = SessionManager(default_runtime="python-datascience")
 
-        # Get sandbox for user
-        sandbox = await manager.get_or_create("user-123")
+        # Custom factory (e.g. Daytona)
+        manager = SessionManager(sandbox_factory=my_factory)
 
-        # Later: cleanup idle sessions
-        cleaned = await manager.cleanup_idle(max_idle=1800)  # 30 min
-        print(f"Cleaned up {cleaned} idle sessions")
+        sandbox = await manager.get_or_create("user-123")
+        cleaned = await manager.cleanup_idle(max_idle=1800)
         ```
     """
 
     def __init__(
         self,
+        sandbox_factory: SandboxFactory | None = None,
         default_runtime: RuntimeConfig | str | None = None,
         default_idle_timeout: int = 3600,
         workspace_root: str | Path | None = None,
@@ -66,21 +80,28 @@ class SessionManager:
         """Initialize the session manager.
 
         Args:
-            default_runtime: Default RuntimeConfig or name for new sandboxes.
+            sandbox_factory: Callable that receives a ``session_id`` string and
+                returns a sandbox instance with ``start()``, ``stop()``,
+                ``is_alive()`` methods and a ``_last_activity`` attribute.
+                When ``None``, defaults to creating :class:`DockerSandbox` instances.
+            default_runtime: Default RuntimeConfig or name for new Docker sandboxes.
+                Only used when ``sandbox_factory`` is ``None``.
             default_idle_timeout: Default idle timeout in seconds (default: 1 hour).
             workspace_root: Root directory for persistent session storage.
-                           If set, creates {workspace_root}/{session_id}/workspace
-                           and mounts it as a volume. Files persist across container restarts.
+                Only used when ``sandbox_factory`` is ``None``.
+                If set, creates ``{workspace_root}/{session_id}/workspace``
+                and mounts it as a Docker volume.
         """
-        self._sessions: dict[str, DockerSandbox] = {}
+        self._sessions: dict[str, Any] = {}
+        self._sandbox_factory = sandbox_factory
         self._default_runtime = default_runtime
         self._default_idle_timeout = default_idle_timeout
         self._cleanup_task: asyncio.Task[None] | None = None
         self._workspace_root = Path(workspace_root) if workspace_root else None
 
     @property
-    def sessions(self) -> dict[str, DockerSandbox]:
-        """Active sessions dictionary (read-only access)."""
+    def sessions(self) -> dict[str, Any]:
+        """Active sessions dictionary (read-only copy)."""
         return dict(self._sessions)
 
     @property
@@ -92,24 +113,20 @@ class SessionManager:
         self,
         session_id: str,
         runtime: RuntimeConfig | str | None = None,
-    ) -> DockerSandbox:
+    ) -> Any:
         """Get an existing sandbox or create a new one.
 
-        If a sandbox exists for the session_id and is still alive,
+        If a sandbox exists for the ``session_id`` and is still alive,
         it will be returned. Otherwise, a new sandbox will be created.
 
         Args:
             session_id: Unique identifier for the session.
-            runtime: RuntimeConfig or name to use (defaults to manager's default).
+            runtime: RuntimeConfig or name to use. Only applies when using
+                the default Docker factory (ignored with custom ``sandbox_factory``).
 
         Returns:
-            DockerSandbox instance for the session.
-
-        Raises:
-            ValueError: If no runtime specified and no default runtime set.
+            Sandbox instance for the session.
         """
-        from pydantic_ai_backends.backends.docker.sandbox import DockerSandbox
-
         # Check for existing session
         if session_id in self._sessions:
             sandbox = self._sessions[session_id]
@@ -119,6 +136,27 @@ class SessionManager:
             # Container died, remove from cache
             del self._sessions[session_id]
 
+        # Create via factory or default Docker path
+        if self._sandbox_factory is not None:
+            sandbox = self._sandbox_factory(session_id)
+        else:
+            sandbox = self._create_docker_sandbox(session_id, runtime)
+
+        sandbox.start()
+        self._sessions[session_id] = sandbox
+        return sandbox
+
+    def _create_docker_sandbox(
+        self,
+        session_id: str,
+        runtime: RuntimeConfig | str | None = None,
+    ) -> Any:
+        """Create a DockerSandbox with the legacy configuration.
+
+        This is the default path when no ``sandbox_factory`` is provided.
+        """
+        from pydantic_ai_backends.backends.docker.sandbox import DockerSandbox
+
         # Prepare volumes for persistent storage
         volumes: dict[str, str] | None = None
         if self._workspace_root:
@@ -126,20 +164,16 @@ class SessionManager:
             session_workspace.mkdir(parents=True, exist_ok=True)
             volumes = {str(session_workspace.resolve()): "/workspace"}
 
-        # Create new sandbox
         effective_runtime = runtime or self._default_runtime
-        sandbox = DockerSandbox(
+        return DockerSandbox(
             runtime=effective_runtime,
             session_id=session_id,
             idle_timeout=self._default_idle_timeout,
             volumes=volumes,
         )
-        sandbox.start()
-        self._sessions[session_id] = sandbox
-        return sandbox
 
     async def release(self, session_id: str) -> bool:
-        """Release a session and stop its container.
+        """Release a session and stop its sandbox.
 
         Args:
             session_id: Session identifier to release.

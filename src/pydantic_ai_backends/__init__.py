@@ -69,6 +69,7 @@ if TYPE_CHECKING:
         SessionManager,
     )
     from pydantic_ai_backends.backends.docker.runtimes import get_runtime
+    from pydantic_ai_backends.backends.docker.session import SandboxFactory
     from pydantic_ai_backends.hashline import (
         apply_hashline_edit,
         apply_hashline_edit_with_summary,
@@ -147,6 +148,7 @@ _LAZY_IMPORTS = {
     "DockerSandbox": "pydantic_ai_backends.backends.docker.sandbox",
     "BaseSandbox": "pydantic_ai_backends.backends.base",
     "SessionManager": "pydantic_ai_backends.backends.docker.session",
+    "SandboxFactory": "pydantic_ai_backends.backends.docker.session",
     "BUILTIN_RUNTIMES": "pydantic_ai_backends.backends.docker.runtimes",
     "get_runtime": "pydantic_ai_backends.backends.docker.runtimes",
     # Permissions system
@@ -230,6 +232,7 @@ __all__ = [
     "BaseSandbox",
     "DockerSandbox",
     "SessionManager",
+    "SandboxFactory",
     # Runtimes
     "BUILTIN_RUNTIMES",
     "get_runtime",

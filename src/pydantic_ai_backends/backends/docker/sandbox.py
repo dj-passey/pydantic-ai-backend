@@ -67,6 +67,7 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         idle_timeout: int = 3600,
         volumes: dict[str, str] | None = None,
         network_mode: str | None = None,
+        container_name: str | None = None,
     ):
         """Initialize Docker sandbox.
 
@@ -74,7 +75,8 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
             image: Docker image to use (ignored if runtime is provided).
             sandbox_id: Unique identifier for this sandbox.
             work_dir: Working directory inside container (ignored if runtime is provided).
-            auto_remove: Remove container when stopped.
+            auto_remove: Remove container when stopped. Forced to ``False``
+                when ``container_name`` is set (reusable containers).
             runtime: RuntimeConfig or name of built-in runtime.
             session_id: Alias for sandbox_id (for session management).
             idle_timeout: Timeout in seconds for idle cleanup (default: 1 hour).
@@ -82,12 +84,18 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
                      Format: {"/host/path": "/container/path"}
             network_mode: Docker network mode ("bridge", "none", "host",
                          "container:<name|id>"). None uses Docker default.
+            container_name: Stable Docker container name for reuse across
+                restarts. When set, ``_ensure_container()`` looks for an existing
+                container with this name and reattaches (or starts it if stopped)
+                instead of creating a new one. Implies ``auto_remove=False``.
         """
         # session_id is an alias for sandbox_id
         effective_id = session_id or sandbox_id
         super().__init__(effective_id)
 
-        self._auto_remove = auto_remove
+        self._container_name = container_name
+        # Named containers must not be auto-removed (they're meant to be reused)
+        self._auto_remove = False if container_name else auto_remove
         self._container = None
         self._idle_timeout = idle_timeout
         self._last_activity = time.time()
@@ -125,12 +133,19 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
         return path
 
     def _ensure_container(self) -> None:
-        """Ensure Docker container is running."""
+        """Ensure Docker container is running.
+
+        When ``container_name`` is set, looks for an existing container with
+        that name and reattaches.  Stopped containers are restarted so that
+        installed packages, caches, and other filesystem state are preserved
+        across CLI sessions.
+        """
         if self._container is not None:
             return
 
         try:
             import docker
+            import docker.errors
         except ImportError as e:
             raise ImportError(
                 "Docker package not installed. "
@@ -138,6 +153,22 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
             ) from e
 
         client = docker.from_env()
+
+        # Try to reattach to an existing named container
+        if self._container_name:
+            try:
+                existing = client.containers.get(self._container_name)
+                status = existing.status
+                if status == "running":
+                    self._container = existing
+                    return
+                if status in ("created", "exited", "paused"):
+                    existing.start()
+                    self._container = existing
+                    return
+                # Other statuses (dead, removing) — fall through to create
+            except docker.errors.NotFound:
+                pass  # Will create a new container below
 
         # Get the appropriate image (build if needed for runtime)
         image = self._ensure_runtime_image(client)
@@ -161,6 +192,8 @@ class DockerSandbox(BaseSandbox):  # pragma: no cover
             environment=env_vars,
             volumes=docker_volumes if docker_volumes else None,
         )
+        if self._container_name is not None:
+            run_kwargs["name"] = self._container_name
         if self._network_mode is not None:
             run_kwargs["network_mode"] = self._network_mode
 

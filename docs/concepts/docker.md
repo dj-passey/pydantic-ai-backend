@@ -135,6 +135,21 @@ sandbox = DockerSandbox(
 )
 ```
 
+### Named Containers (Reusable)
+
+Use `container_name` to create containers that persist between sessions.
+Installed packages, caches, and filesystem state survive restarts:
+
+```python
+sandbox = DockerSandbox(
+    image="python:3.12-slim",
+    container_name="my-dev-env",  # implies auto_remove=False
+    volumes={"/my/project": "/workspace"},
+)
+# First run: creates container "my-dev-env"
+# Next run: finds it, restarts if stopped, reattaches
+```
+
 With SessionManager, each user gets their own persistent directory:
 
 ```python
@@ -142,6 +157,24 @@ manager = SessionManager(
     workspace_root="/app/workspaces",  # Creates /app/workspaces/{user_id}/
 )
 ```
+
+### Custom Sandbox Factory
+
+`SessionManager` accepts a `sandbox_factory` callable to use any sandbox
+backend (Daytona, custom implementations, etc.):
+
+```python
+from pydantic_ai_backends import SessionManager, DaytonaSandbox
+
+def daytona_factory(session_id: str) -> DaytonaSandbox:
+    return DaytonaSandbox(sandbox_id=session_id)
+
+manager = SessionManager(sandbox_factory=daytona_factory)
+sandbox = await manager.get_or_create("user-123")
+```
+
+When no factory is provided, `SessionManager` defaults to creating
+`DockerSandbox` instances (fully backward compatible).
 
 ## Security
 

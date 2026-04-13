@@ -9,7 +9,7 @@ Backends provide file storage for your pydantic-ai agents. All backends implemen
 | `LocalBackend` | Persistent | Yes | CLI tools, local development |
 | `StateBackend` | Ephemeral | No | Unit testing, mocking |
 | `DockerSandbox` | Ephemeral* | Yes | Safe execution, multi-user |
-| `DaytonaSandbox` | Ephemeral | Yes | Cloud deployments, CI/CD |
+| `DaytonaSandbox` | Ephemeral | Yes | Cloud deployments, CI/CD, multi-user |
 | `CompositeBackend` | Mixed | Depends | Route by path prefix |
 
 ## LocalBackend

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shlex
+import time
 import uuid
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
@@ -85,11 +86,30 @@ class BaseSandbox(ABC):
             sandbox_id: Unique identifier for this sandbox. Generated if not provided.
         """
         self._id = sandbox_id or str(uuid.uuid4())  # pragma: no cover
+        self._last_activity = time.time()  # pragma: no cover
 
     @property
     def id(self) -> str:
         """Unique identifier for this sandbox."""
         return self._id  # pragma: no cover
+
+    def start(self) -> None:  # pragma: no cover  # noqa: B027
+        """Start the sandbox.
+
+        Override for eager initialization. The default is a no-op
+        (sandboxes start lazily on first operation).
+        """
+
+    def is_alive(self) -> bool:  # pragma: no cover
+        """Check if the sandbox is running.
+
+        Returns:
+            True if the sandbox is running and responsive, False otherwise.
+        """
+        return False
+
+    def stop(self) -> None:  # pragma: no cover  # noqa: B027
+        """Stop and clean up the sandbox."""
 
     @abstractmethod
     def execute(

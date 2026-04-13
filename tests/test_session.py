@@ -40,6 +40,30 @@ class MockDockerSandbox:
         self._alive = False
 
 
+class MockCustomSandbox:
+    """Mock sandbox for testing custom factory support."""
+
+    def __init__(self, session_id: str) -> None:
+        self._id = session_id
+        self._last_activity = time.time()
+        self._alive = True
+        self._started = False
+
+    @property
+    def session_id(self) -> str:
+        return self._id
+
+    def is_alive(self) -> bool:
+        return self._alive
+
+    def start(self) -> None:
+        self._started = True
+        self._alive = True
+
+    def stop(self) -> None:
+        self._alive = False
+
+
 class TestSessionManager:
     """Tests for SessionManager class."""
 
@@ -66,6 +90,15 @@ class TestSessionManager:
         """Test initialization with custom timeout."""
         manager = SessionManager(default_idle_timeout=1800)
         assert manager._default_idle_timeout == 1800
+
+    def test_init_with_factory(self):
+        """Test initialization with custom sandbox factory."""
+
+        def factory(sid: str) -> MockCustomSandbox:
+            return MockCustomSandbox(sid)
+
+        manager = SessionManager(sandbox_factory=factory)
+        assert manager._sandbox_factory is factory
 
     @pytest.mark.asyncio
     async def test_get_or_create_new_session(self):
@@ -296,3 +329,156 @@ class TestSessionManager:
             # Check separate volumes
             assert str(dir1.resolve()) in sandbox1._volumes
             assert str(dir2.resolve()) in sandbox2._volumes
+
+
+class TestSessionManagerWithFactory:
+    """Tests for SessionManager with custom sandbox_factory."""
+
+    @pytest.mark.asyncio
+    async def test_factory_called_with_session_id(self):
+        """Test that factory receives the session_id."""
+        created_ids: list[str] = []
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            created_ids.append(session_id)
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(sandbox_factory=factory)
+        await manager.get_or_create("user-42")
+
+        assert created_ids == ["user-42"]
+
+    @pytest.mark.asyncio
+    async def test_factory_sandbox_started(self):
+        """Test that factory-created sandboxes get start() called."""
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(sandbox_factory=factory)
+        sandbox = await manager.get_or_create("user-1")
+        assert sandbox._started is True
+
+    @pytest.mark.asyncio
+    async def test_factory_sandbox_reused_when_alive(self):
+        """Test that alive factory sandboxes are reused."""
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(sandbox_factory=factory)
+        s1 = await manager.get_or_create("user-1")
+        s2 = await manager.get_or_create("user-1")
+        assert s1 is s2
+
+    @pytest.mark.asyncio
+    async def test_factory_sandbox_recreated_when_dead(self):
+        """Test that dead factory sandboxes are recreated."""
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(sandbox_factory=factory)
+        s1 = await manager.get_or_create("user-1")
+        s1._alive = False
+
+        s2 = await manager.get_or_create("user-1")
+        assert s1 is not s2
+        assert s2._started is True
+
+    @pytest.mark.asyncio
+    async def test_factory_release_stops_sandbox(self):
+        """Test that releasing a factory sandbox calls stop()."""
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(sandbox_factory=factory)
+        sandbox = await manager.get_or_create("user-1")
+        assert sandbox._alive is True
+
+        await manager.release("user-1")
+        assert sandbox._alive is False
+        assert "user-1" not in manager
+
+    @pytest.mark.asyncio
+    async def test_factory_cleanup_idle(self):
+        """Test idle cleanup with factory sandboxes."""
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(
+            sandbox_factory=factory,
+            default_idle_timeout=10,
+        )
+        s1 = await manager.get_or_create("user-1")
+        s2 = await manager.get_or_create("user-2")
+
+        s1._last_activity = time.time() - 20  # idle
+        s2._last_activity = time.time()  # active
+
+        cleaned = await manager.cleanup_idle()
+        assert cleaned == 1
+        assert "user-1" not in manager
+        assert "user-2" in manager
+
+    @pytest.mark.asyncio
+    async def test_factory_shutdown(self):
+        """Test shutdown with factory sandboxes."""
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(sandbox_factory=factory)
+        await manager.get_or_create("a")
+        await manager.get_or_create("b")
+
+        count = await manager.shutdown()
+        assert count == 2
+        assert manager.session_count == 0
+
+    @pytest.mark.asyncio
+    async def test_factory_ignores_runtime_param(self):
+        """Test that runtime param is ignored when using factory."""
+        factory_calls: list[str] = []
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            factory_calls.append(session_id)
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(sandbox_factory=factory)
+        # Pass runtime — should be ignored (factory doesn't receive it)
+        await manager.get_or_create("user-1", runtime="python-datascience")
+        assert factory_calls == ["user-1"]
+
+    @pytest.mark.asyncio
+    async def test_factory_ignores_workspace_root(self, tmp_path):
+        """Test that workspace_root doesn't affect factory-created sandboxes."""
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(
+            sandbox_factory=factory,
+            workspace_root=tmp_path,
+        )
+        await manager.get_or_create("user-1")
+
+        # workspace_root should NOT create directories for factory sandboxes
+        assert not (tmp_path / "user-1").exists()
+
+    @pytest.mark.asyncio
+    async def test_factory_activity_updated_on_reuse(self):
+        """Test that _last_activity is updated when reusing a session."""
+
+        def factory(session_id: str) -> MockCustomSandbox:
+            return MockCustomSandbox(session_id)
+
+        manager = SessionManager(sandbox_factory=factory)
+        sandbox = await manager.get_or_create("user-1")
+        sandbox._last_activity = time.time() - 100  # Simulate old activity
+
+        before = sandbox._last_activity
+        await manager.get_or_create("user-1")
+        assert sandbox._last_activity > before

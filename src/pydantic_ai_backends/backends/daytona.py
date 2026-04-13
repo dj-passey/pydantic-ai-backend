@@ -99,6 +99,9 @@ class DaytonaSandbox(BaseSandbox):  # pragma: no cover
     # SandboxProtocol — execute
     # ------------------------------------------------------------------
 
+    def start(self) -> None:
+        """No-op — Daytona sandboxes start automatically on creation."""
+
     def execute(self, command: str, timeout: int | None = None) -> ExecuteResponse:
         """Execute a command inside the Daytona sandbox.
 
@@ -109,6 +112,7 @@ class DaytonaSandbox(BaseSandbox):  # pragma: no cover
         Returns:
             :class:`ExecuteResponse` with output, exit code, and truncation flag.
         """
+        self._last_activity = time.time()
         effective_timeout = timeout if timeout is not None else 30 * 60
         try:
             result = self._sandbox.process.exec(

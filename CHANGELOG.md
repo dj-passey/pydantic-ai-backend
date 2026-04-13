@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2026-04-11
+
+### Added
+
+- **`container_name` parameter on `DockerSandbox`** — stable Docker container name for reuse across restarts. When set, `_ensure_container()` looks for an existing container with that name and reattaches (running containers are reused, stopped containers are restarted). Implies `auto_remove=False` so installed packages, caches, and filesystem state persist between sessions
+- **`sandbox_factory` parameter on `SessionManager`** — accepts a `Callable[[str], Any]` to create sandboxes of any type (Docker, Daytona, or custom). When `None`, falls back to the default `DockerSandbox` behavior (fully backward compatible). Exported `SandboxFactory` type alias
+- **Lifecycle methods on `BaseSandbox`** — `start()`, `is_alive()`, `stop()`, and `_last_activity` tracking added to the base class so all sandbox types support session management out of the box
+- **`start()` method on `DaytonaSandbox`** — no-op (Daytona sandboxes auto-start on creation), added for `SessionManager` compatibility
+- **Activity tracking on `DaytonaSandbox`** — `_last_activity` updated on `execute()` calls for idle session cleanup
+
+### Changed
+
+- **`SessionManager` is now backend-agnostic** — no longer hardcoded to `DockerSandbox`. Works with any sandbox that has `start()`, `stop()`, `is_alive()`, and `_last_activity`. Type hints changed from `DockerSandbox` to `Any` for generic usage
+
 ## [0.2.3] - 2026-04-06
 
 ### Changed
