@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2026-04-20
+
+### Fixed
+
+- **Globstar support in `BaseSandbox.glob_info`** — replaced `find -name` with `find -path` so patterns like `**/*.md` match nested files. Previously sandbox backends silently returned empty results for globstar patterns, breaking callers that rely on recursive discovery (e.g. pydantic-deep's skills toolset). Behavior now aligns with `StateBackend`. ([#32](https://github.com/vstorm-co/pydantic-ai-backend/pull/32), by [@ilayu-blip](https://github.com/ilayu-blip))
+
 ## [0.2.4] - 2026-04-11
 
 ### Added
