@@ -7,6 +7,7 @@ import time
 import uuid
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
+from pathlib import PurePosixPath
 
 from pydantic_ai_backends.types import (
     EditResult,
@@ -230,21 +231,19 @@ class BaseSandbox(ABC):
         """Find files using find command."""
         # Convert glob to find pattern
         path = shlex.quote(path)
-        result = self.execute(f"find {path} -name '{pattern}' -type f 2>/dev/null")
+        result = self.execute(f"find '{path}' -path '{pattern}' -type f 2>/dev/null")
 
         if result.exit_code != 0:
             return []
 
         entries: list[FileInfo] = []
-        for file_path in result.output.strip().split("\n"):
-            if not file_path:
-                continue
-
-            name = file_path.split("/")[-1]
+        for full_file_path in result.output.splitlines():
+            file_path = PurePosixPath(full_file_path)
+            name = file_path.name
             entries.append(
                 FileInfo(
                     name=name,
-                    path=file_path,
+                    path=str(file_path),
                     is_dir=False,
                     size=None,
                 )
